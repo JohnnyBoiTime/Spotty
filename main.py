@@ -17,7 +17,7 @@ class sserver(BaseHTTPRequestHandler):
 httpd = HTTPServer(('localhost', 8080), sserver)
 httpd.serve_forever()
 
-connection = psycopg2.connect(host="localhost", dbname="postgres", user="postgres", password="myDataBase123", port="5432")
+connection = psycopg2.connect(host="", dbname="", user="", password="", port="")
 
 cur = connection.cursor()
 
