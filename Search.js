@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text} from 'react-native';
 import { NavigationContainer} from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { NativeBaseProvider, Heading, Menu, Box, Button, Pressable, Input, View, Icon, FlatList } from 'native-base';
+import { NativeBaseProvider, Heading, Menu, Box, Button, Pressable, Input, View, Icon, FlatList, composeEventHandlers } from 'native-base';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // Add something on the side of the input that allows you to search
@@ -10,8 +10,30 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const Search = () => {
 
+/*
+    const apiKey = 'live_Go7TYaeWOri1dQsbqa2Y2rDMRzrrexlLTbNf4uYj77VGRcqxziVvUrhZbfG1dnm0';
+    const apiLink = `https://api.thecatapi.com/v1/images/search?api_key=${apiKey}`;
+
+    axios.get('https://api.thecatapi.com/v1/images/search?api_key=${apiKey}')
+        .then(response => response.json())
+        .then(data => {
+            const imageUrl = data[0].url;
+            console.log(`IMAGE: ${imageUrl}`);
+        })
+*/
     const IconName = ["person-sharp", "disc-sharp", "musical-notes-sharp"];
     const [useIcon, setUseIcon] = useState(IconName[0]);
+
+    const changeIcon = (value) => {
+        setUseIcon(value);
+        console.log(value);
+    };
+
+    const placeHolderName = {
+        'person-sharp': 'Search by artist',
+        'disc-sharp': 'Search by Album',
+        'musical-notes-sharp': 'Search by Song',
+    };
 
     return <LinearGradient
         colors ={['#32174d', '#87ceeb' /*, '#800080'*/]} 
@@ -20,25 +42,36 @@ const Search = () => {
         >
             <Heading size="xl" textAlign={'center'} paddingTop={8} color="white" ></Heading>
             <Input 
-            InputRightElement={<Menu w="190" type="radio" trigger={triggerProps => {
+            InputRightElement={
+            <Box><Menu backgroundColor="#313336" w="190" closeOnSelect={false} trigger={triggerProps => {
                 return <Pressable accessibilityLabel="More options menu" {...triggerProps}>
                     <Icon as={<Ionicons name={useIcon}/>} 
                     size={5}
                     />
                 </Pressable>;
+                
             }}>
-                <Menu.OptionGroup defaultValue="person-sharp" type="radio">
-                <Menu.ItemOption value="person-sharp">Search by Artist</Menu.ItemOption>
-                <Menu.ItemOption value="disc-sharp">Search by Album</Menu.ItemOption>
-                <Menu.ItemOption value="musical-notes-sharp">Search by Song</Menu.ItemOption>
+                {useIcon && (
+                <Menu.OptionGroup title="Search by:" value={useIcon} onChange={(value) => changeIcon(value)} defaultValue="person-sharp" type="radio" >
+                <Menu.ItemOption value="person-sharp"><Text style={styles.textColor}>Artist</Text></Menu.ItemOption>
+                <Menu.ItemOption value="disc-sharp"><Text style={styles.textColor}>Album</Text></Menu.ItemOption>
+                <Menu.ItemOption value="musical-notes-sharp"><Text style={styles.textColor}>Song</Text></Menu.ItemOption>
                 </Menu.OptionGroup>
-                </Menu>    
+                )}
+                </Menu>
+                </Box>    
             }  
             color="white"
             mx="3" 
-            placeholder="Search for artist" />
+            placeholder={placeHolderName[useIcon]} />
         </LinearGradient>
     
 };
+
+const styles = StyleSheet.create({
+    textColor: {
+        color: 'white',
+    },
+});
 
 export default Search;
