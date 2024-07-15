@@ -4,7 +4,7 @@ HOW TO USE (SO FAR):
 
 Put albums in folders, must be in bandcamp format.
 
-node GenerateAlbum.js generates album from directories, so make sure album is in a file that is the name of the album.
+node GenerateAlbum.js generates album from directories in assets, so make sure album is in a file that is the name of the album.
 
 
 TO DO LIST (For front-end):
