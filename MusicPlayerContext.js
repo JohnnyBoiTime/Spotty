@@ -88,6 +88,7 @@ export const MusicPlayerProvider = ({ children }) => {
         }
     };
 
+    // Milliseconds -> (minutes/seconds)
     const time = (millis) => {
         const minutes = Math.floor(millis / 60000);
         const seconds = Math.floor((millis % 60000) / 1000);
