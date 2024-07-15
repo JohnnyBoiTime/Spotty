@@ -1,101 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, ScrollView, Image} from 'react-native';
-import { NavigationContainer, useNavigation} from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { useSelector } from 'react-redux';
-import Animated, { FadeIn, FadeOut, useSharedValue, withTiming, useAnimatedStyle, withRepeat } from 'react-native-reanimated';
-import { NativeBaseProvider, Heading, HStack, Box, Button, Input, FormControl, View, Icon, VStack, Container, Pressable } from 'native-base';
+import React, { useState, useEffect} from 'react';
+import { StyleSheet, ScrollView, Image,} from 'react-native';
+import { useMusicPlayer } from './Contexts.js/MusicPlayerContext';
+import {  Heading, HStack, Box, VStack, Pressable } from 'native-base';
 import { LinearGradient } from 'expo-linear-gradient';
+import { importedAlbums } from './Albums';
 
+// Whats new and recoomended are just for show and proof of concept, may change later
 
-// In Progress look for log in screen!
+const Home = ({navigation}) => {
 
-const Home = () => {
+    const {
+        setNumSongs,
+        setCurrentSongList,
+        setNameOfAlbum,
+        setNameOfArtist,
+        setAlbumCover,
+    } = useMusicPlayer();
 
     
+        // Set info for the chosen album
+    const albumDetails = (album) => {
+        setNameOfAlbum(album.title);
+        setNumSongs(album.songs.title.length);
+        setCurrentSongList(album.songs);
+        setAlbumCover(album.cover);
+        setNameOfArtist(album.artist);
+        navigation.navigate("AlbumContents");
+        
+    };
 
-    const [visible, setVisible] = useState(true);
 
-   // const currentSong = useSelector((state) => state.currentSong);
-
-    const navigation = useNavigation();
-
-    const translateX = useSharedValue(0);
-    
-    const scale = useSharedValue(0);
-
-    const ImageMove = Animated.createAnimatedComponent(Image);
-    const FadeInList = Animated.createAnimatedComponent(ScrollView);
-
-    const moveImage = () => {
-        translateX.value += 50;
-
-        setVisible(false);
-        scale.value += 50
-
-        setTimeout(() => {
-            navigation.navigate('AlbumContents')
-        }, 300)
-      };
-
-      const animatedStyles = useAnimatedStyle(() => ({
-        transform: [{ translateX: withTiming(translateX.value * 3) }],
-      }));
-    
     return (
+        // Cool gradient background
         <LinearGradient
         colors ={['#502fb7', '#5e3ec2' /*, '#800080'*/]} 
         locations={[0.8, 1] /* transition */}
         style={{ flex: 1}}
         >
-        <Heading marginTop={20}>Favorites:</Heading>
+        <Heading marginTop={2}></Heading>
+
+        {/* Formatted content vertically and scroll horizontally */}
         <VStack space={5}>
-        <FadeInList horizontal={true} entering={FadeIn.duration(1000)} exiting={FadeOut}>
-        <HStack space={3} justifyContent="center" >
-            <Pressable onPress={ /*() => {navigation.navigate('AlbumContents')*/ moveImage}>
-          <ImageMove 
-            
-            source={require('./assets/Dream.jpg')}
-            style={[styles.imageInfo, animatedStyles]}
-            />
-            </Pressable>
-            {visible && (
+        <Box alignContent='center'>
+            <Heading>Downloaded: </Heading>
+            <ScrollView horizontal={true}>
+            {/*Displays all albums from Album.js */}
             <HStack space={3}>
-            <Image source={require('./assets/Computer.jpg')} style={styles.imageInfo}/>
-            <Image source={require('./assets/Magic.jpg')} style={styles.imageInfo}/>
-            <Image source={require('./assets/Crossroads.jpg')} style={styles.imageInfo}/>
-            <Image source={require('./assets/Panchiko.jpg')} style={styles.imageInfo}/>
+                {importedAlbums.map((album, index) => ( 
+                    <Pressable key={index} onPress={() => albumDetails(album)}>
+                    <Image style={styles.imageInfo} key={index} source={album.cover}></Image>
+                    </Pressable>
+                ))}
             </HStack>
-            )}
-            </HStack>
-            </FadeInList>
+            </ScrollView>
+            </Box>
             <Box alignContent='center'>
             <Heading>Whats New: </Heading>
-            <FadeInList horizontal={true} entering={FadeIn.duration(1000)} exiting={FadeOut}>
+            <ScrollView horizontal={true}>
             <HStack space={3}>
-            <Image source={require('./assets/Computer.jpg')} style={styles.imageInfo}/>
+            <Image source={require('./assets/Biscuit.jpg')} style={styles.imageInfo}/>
             <Image source={require('./assets/Magic.jpg')} style={styles.imageInfo}/>
             <Image source={require('./assets/Crossroads.jpg')} style={styles.imageInfo}/>
             <Image source={require('./assets/Panchiko.jpg')} style={styles.imageInfo}/>
             </HStack>
-            </FadeInList>
+            </ScrollView>
             </Box>
             <Box alignContent='center'>
             <Heading>Recommended: </Heading>
-            <FadeInList horizontal={true} entering={FadeIn.duration(1000)} exiting={FadeOut}>
+            <ScrollView horizontal={true}>
             <HStack space={3}>
             <Image source={require('./assets/Computer.jpg')} style={styles.imageInfo}/>
             <Image source={require('./assets/Magic.jpg')} style={styles.imageInfo}/>
             <Image source={require('./assets/Crossroads.jpg')} style={styles.imageInfo}/>
             <Image source={require('./assets/Panchiko.jpg')} style={styles.imageInfo}/>
             </HStack>
-            </FadeInList>
+            </ScrollView>
             </Box>
             </VStack>
         </LinearGradient>
     );
 };
-
 
 const styles = StyleSheet.create({
     text : {
