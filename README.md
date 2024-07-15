@@ -19,4 +19,6 @@ TO DO LIST (For front-end):
 
 -Improve song loading and plaaying times, maybe pre-load the music?
 
+-Add progress bar for downloaded music / music that still needs to be downloaded
+
 -Other stuff
