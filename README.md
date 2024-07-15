@@ -17,4 +17,6 @@ TO DO LIST (For front-end):
 
 -Make log in screen work, as well as create account and forgot password
 
+-Improve song loading and plaaying times, maybe pre-load the music?
+
 -Other stuff
