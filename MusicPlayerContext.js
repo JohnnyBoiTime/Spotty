@@ -9,6 +9,8 @@ import * as FileSystem from 'expo-file-system';
 const MusicPlayerContext = createContext();
 
 export const MusicPlayerProvider = ({ children }) => {
+    // Some are not needed as it changed through making the project,
+    // will go through later
     const [nameOfSong, setNameOfSong] = useState('');
     const [nameOfAlbum, setNameOfAlbum] = useState('');
     const [albumCover, setAlbumCover] = useState('');
@@ -132,6 +134,7 @@ export const MusicPlayerProvider = ({ children }) => {
     }, [songIndex]);
 
     return (
+        // Some are not needed, will go through it later
         <MusicPlayerContext.Provider
             value={{
                 currentSongList,
