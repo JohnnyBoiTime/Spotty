@@ -20,6 +20,6 @@ TO DO LIST (For front-end):
 ~~Improve song loading and playing times, maybe pre-load the music?~~ (Done 7/15/2024, pre-downloads music) 
     -IMPROVE LOADING TIMES SOMEHOW (CHUNKS? PARALLEL?)
 
--Add progress bar for downloaded music / music that still needs to be downloaded
+-Add progress bar/number on screen for downloaded music / music that still needs to be downloaded so user can see progress
 
 -Other stuff
