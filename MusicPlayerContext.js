@@ -123,7 +123,7 @@ export const MusicPlayerProvider = ({ children }) => {
                 const songPath = album.songs.path[i];
                 try {
                     const {sound: newSound} = await Audio.Sound.createAsync(songPath);
-                    downloadedMusic[songTitle] = newSound; // save title as key for easy access
+                    downloadedMusic[songTitle] = newSound; // save title as key for easy access to audio 
                     console.log(`Successfully downloaded: ${songTitle} (${songsDownloaded++} / ${totalSongsToDownload})`);
                 } catch (error) { 
                     console.log("Could not download all music ", error);
