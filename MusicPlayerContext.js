@@ -95,6 +95,51 @@ export const MusicPlayerProvider = ({ children }) => {
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
 
+    // Put all music into a list to download
+    const preLoadMusic = async () => {
+
+        const downloadedMusic = {}; // Temp store download music
+
+        // keep track of amount of songs downlaoded
+        let songsDownloaded = 1;
+        let totalSongsToDownload = 0;
+
+        const listSongs = importedAlbums.flatMap(album => 
+            album.songs.title.map((title, index) => ({
+                title,
+                path: album.songs.path[index]
+            }))
+        );
+
+        // See how many albums need to be downloaded
+        importedAlbums.forEach(importedAlbums => {
+            totalSongsToDownload += importedAlbums.songs.title.length;
+        });
+
+        // Go through all imported music and load individually, works, but is slow
+        for (const album of importedAlbums) {
+            for (let i = 0; i < album.songs.title.length; i++) {
+                const songTitle = album.songs.title[i];
+                const songPath = album.songs.path[i];
+                try {
+                    const {sound: newSound} = await Audio.Sound.createAsync(songPath);
+                    downloadedMusic[songTitle] = newSound; // save title as key for easy access
+                    console.log(`Successfully downloaded: ${songTitle} (${songsDownloaded++} / ${totalSongsToDownload})`);
+                } catch (error) { 
+                    console.log("Could not download all music ", error);
+                }
+
+            };
+        }
+        setDownloadedList(downloadedMusic); // Store downloaded songs to access later
+    };
+
+    // Pre-load all music at start up, probably change
+    // to after the user logs in, or just hve no log
+    // in at all
+    useEffect(() => {
+        preLoadMusic();
+    }, []);
 
     useEffect(() => {
         const startSong = async () => {
