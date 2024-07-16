@@ -28,6 +28,16 @@ export const MusicPlayerProvider = ({ children }) => {
     const [numSongs, setNumSongs] = useState(0);
     const songRef = useRef(null);
 
+    // Seems to not work correctly without this effect, will test more on it later
+     useEffect(() => {
+        if (songRef.current) {
+            // song.stopAsync();
+            // song.unloadAsync();
+            songRef.current.stopAsync();
+            songRef.current.unloadAsync();
+        }
+    }, []);
+    
      // Plays song
      const resumeSong = async () => {
         try{
@@ -123,9 +133,12 @@ export const MusicPlayerProvider = ({ children }) => {
         preLoadMusic();
     }, []);
 
+    // Index specific, so function is put inside useEffect
     useEffect(() => {
-        const startSong = async () => {
 
+        // Play selected audio file
+        const startSong = async () => {
+        
             // When song is tapped again, restarts song
             // When a different song is played, unloads previous song
             // And loads in new one
@@ -133,17 +146,17 @@ export const MusicPlayerProvider = ({ children }) => {
                 await songRef.current.stopAsync();
                 await songRef.current.unloadAsync();
             }
-    
+
             // Creates/plays sound
-            const {sound: newSound} = await Audio.Sound.createAsync(currentSongList.path[songIndex]);
-            songRef.current = newSound;
-            await newSound.playAsync();
+            songRef.current = audioToPlay[songIndex];
+            console.log("inside!");
+            await audioToPlay[songIndex].playAsync();
             setIsPlaying(true);
             console.log(songRef.current);
             setNameOfSong(currentSongList.title[songIndex]);
 
             // Updates current positon of the song (in milliseconds)
-            newSound.setOnPlaybackStatusUpdate((status) => {
+            audioToPlay[songIndex].setOnPlaybackStatusUpdate((status) => {
                 if (status.isLoaded) {
                     setPlaybackPos(status.positionMillis);
                     setPlaybackDuration(status.durationMillis);
@@ -160,7 +173,8 @@ export const MusicPlayerProvider = ({ children }) => {
 
             console.log("song be playing!");
         };
-        startSong();
+
+            startSong();
     }, [songIndex]);
 
     return (
