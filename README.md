@@ -17,7 +17,8 @@ TO DO LIST (For front-end):
 
 -Make log in screen work, as well as create account and forgot password
 
--~~Improve song loading and playing times, maybe pre-load the music?~~ (Done 7/15/2024) IMPROVE LOADING TIMES SOMEHOW (CHUNKS? PARALLEL?)
+~~Improve song loading and playing times, maybe pre-load the music?~~ (Done 7/15/2024, pre-downloads music) 
+    -IMPROVE LOADING TIMES SOMEHOW (CHUNKS? PARALLEL?)
 
 -Add progress bar for downloaded music / music that still needs to be downloaded
 
