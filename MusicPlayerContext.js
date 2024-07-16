@@ -28,17 +28,6 @@ export const MusicPlayerProvider = ({ children }) => {
     const [numSongs, setNumSongs] = useState(0);
     const songRef = useRef(null);
 
-
-    // Ensures no song is playing
-    useEffect(() => {
-        if (songRef.current) {
-            //   song.stopAsync();
-            //   song.unloadAsync();
-               songRef.current.stopAsync();
-               songRef.current.unloadAsync();
-           }
-    }, []);
-
      // Plays song
      const resumeSong = async () => {
         try{
