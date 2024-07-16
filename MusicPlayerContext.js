@@ -165,6 +165,8 @@ export const MusicPlayerProvider = ({ children }) => {
                 if (status.isLoaded) {
                     setPlaybackPos(status.positionMillis);
                     setPlaybackDuration(status.durationMillis);
+                    // When song finishes, go to next song
+                    // by updating index
                     if (status.didJustFinish) {
                         setIsPlaying(false);
                         const nextIndex = (index + 1) % numSongs;
