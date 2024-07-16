@@ -76,6 +76,7 @@ async function createAlbumList(directory) {
         //  what was captured being put inside of the parantheses ($1 holds the capture)
         //  https://regex101.com/r/iQ5gyQ/1
         //  https://stackoverflow.com/questions/13247864/javascript-replace-string-between-brackets-but-the-brackets-should-stay
+        // https://stackoverflow.com/questions/75410617/how-to-load-local-audio-files-dynamically-with-expo-av
         const outputAlbumList = `export const importedAlbums = ${JSON.stringify(listOfAlbums, null, 1).replace(/"require\((.*?)\)"/g, 'require($1)')};`;
         
         // Output results
