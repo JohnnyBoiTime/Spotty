@@ -93,13 +93,6 @@ export const MusicPlayerProvider = ({ children }) => {
         let songsDownloaded = 1;
         let totalSongsToDownload = 0;
 
-        const listSongs = importedAlbums.flatMap(album => 
-            album.songs.title.map((title, index) => ({
-                title,
-                path: album.songs.path[index]
-            }))
-        );
-
         // See how many albums need to be downloaded
         importedAlbums.forEach(importedAlbums => {
             totalSongsToDownload += importedAlbums.songs.title.length;
