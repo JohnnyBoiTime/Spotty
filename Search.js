@@ -10,18 +10,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const Search = () => {
 
-/*
-    const apiKey = 'live_Go7TYaeWOri1dQsbqa2Y2rDMRzrrexlLTbNf4uYj77VGRcqxziVvUrhZbfG1dnm0';
-    const apiLink = `https://api.thecatapi.com/v1/images/search?api_key=${apiKey}`;
-
-    axios.get('https://api.thecatapi.com/v1/images/search?api_key=${apiKey}')
-        .then(response => response.json())
-        .then(data => {
-            const imageUrl = data[0].url;
-            console.log(`IMAGE: ${imageUrl}`);
-            
-        })
-*/
     const IconName = ["person-sharp", "disc-sharp", "musical-notes-sharp"];
     const [useIcon, setUseIcon] = useState(IconName[0]);
     const [searchResults, setSearchResults] = useState([]);
