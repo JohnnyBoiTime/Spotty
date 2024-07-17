@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet} from 'react-native';
 import { useMusicPlayer } from './Contexts.js/MusicPlayerContext';
-import { Heading, Image, VStack, Text,Button, ScrollView} from 'native-base';
+import { Heading, Image, VStack, Text,Button, ScrollView, Stack, Box} from 'native-base';
 import { LinearGradient } from 'expo-linear-gradient';
-
-
-// Use logic for skipping the song to change the color in the album
 
 // https://stackoverflow.com/questions/47922687/force-react-to-reload-an-image-file Help with image to use key to force re-render
 
@@ -13,46 +10,73 @@ const InsideTheAlbum = () => {
     const {
         nameOfAlbum,
         nameOfArtist,
-        songIndex,
-        currentSongList,
+        setAudioToPlay,
+        downloadedList,
+        changeSongList,
+        setCurrentSongList,
         albumCover,
-        colorOfSong,
+        nameOfSong,
         setSongIndex,
     } = useMusicPlayer();
 
     // Changes index to change song so useEffect can work
-    const handleIndexChange = (index) => {
+    const handleSongChange = (index) => {
+
+        setCurrentSongList(changeSongList);
+        // Get audio for selected songs once user taps on song
+        const updateSongList = changeSongList.title.map(songTitle => downloadedList[songTitle]);
+        setAudioToPlay(updateSongList);
         setSongIndex(index);
-        console.log(songIndex);
+    };
+
+    // Changes song color based on name, potential problem
+    // if there are 2 songs with the same name, probably
+    // make it so artist name and specific album have to
+    // be the same
+    const changeSongColor = (name) => {
+        return name === nameOfSong ? 'black' : 'white';
     };
 
     return (
       <LinearGradient
-      colors ={['#32174d', '#87ceeb' /*, '#800080'*/]} 
-      locations={[1, 1] /* transition */}
+      colors ={['#32174d', '#87ceeb']} 
+      locations={[1, 1]}
       style={{ flex: 1}}
       >
           <Heading size="xl" textAlign={'center'} paddingTop={8} color="white" >{nameOfAlbum}</Heading>
           <Image key={albumCover} source={albumCover} style={styles.imageInfo}/>
           <VStack space={1} alignItems='center'>
-          <Heading  alignItems='center'> <Text style={styles.songNames} color='white'>{nameOfArtist}</Text></Heading> 
+          <Heading  alignItems='center'> <Text color='white'>{nameOfArtist}</Text></Heading> 
           </VStack>
+          <Box>
           <ScrollView>
-          <VStack alignItems='flex-start'>
-            { currentSongList.title.map((song, index) => (
-                
-                <Button key={index} background='transparent' width='100%' style={styles.songButton} height={10} onPress={() => handleIndexChange(index)} ><Text style={styles.songNames} color={colorOfSong}>{song}</Text></Button>
-                
+          <VStack alignItems='flex-start' width= '100%'>
+            { changeSongList.title.map((song, index) => (
+                <Button key={index} background='transparent' style={styles.songButton} height={10} onPress={() => handleSongChange(index)}> 
+                    <Stack>
+                        <Heading isTruncated size='md' mb='0' ml='-1' color={changeSongColor(song)}> {song}</Heading>
+                        <Text ml='0.9' mt='-2' color='white'>{nameOfArtist}</Text>
+                    </Stack>
+                </Button>
             ))} 
           </VStack>
           </ScrollView>
-
+          </Box>
       </LinearGradient>
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
+    songContainer: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+    },
     songNames: {
+        textAlign: 'left',
+        fontSize: 18,
+    },
+    artistNames: {
         textAlign: 'left',
     },
     imageInfo: {
@@ -64,6 +88,7 @@ const styles = StyleSheet.create({
     songButton: {
         justifyContent: 'flex-start',
         paddingLeft: 10,
+        width: '100%'
     }
 });
 
