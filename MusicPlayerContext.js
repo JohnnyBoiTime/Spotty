@@ -1,23 +1,22 @@
 import React, { createContext, Component, useState, setState, useRef, useEffect, useContext } from "react";
 import { Audio } from "expo-av";
-import { current } from "@reduxjs/toolkit";
-import * as FileSystem from 'expo-file-system';
+import { importedAlbums } from "../Albums";
 
 
-// Context screen to control variables 
+// Context screen to control variables/effects
 
 const MusicPlayerContext = createContext();
 
 export const MusicPlayerProvider = ({ children }) => {
-    // Some are not needed as it changed through making the project,
-    // will go through later
     const [nameOfSong, setNameOfSong] = useState('');
     const [nameOfAlbum, setNameOfAlbum] = useState('');
+    const [audioToPlay, setAudioToPlay] = useState([]);
     const [albumCover, setAlbumCover] = useState('');
     const [nameOfArtist, setNameOfArtist] = useState('');
-    const [nameOfSongMP3, setNameOfSongMP3] = useState('');
+    const [downloadedList, setDownloadedList] = useState({title: '', path: ''}); // Probably only need the path
     const [currentSongList, setCurrentSongList] = useState({ title: '', path: ''});
-    const [songIndex, setSongIndex] = useState(0);
+    const [changeSongList, setChangeSongList] = useState({title: '', path: ''});
+    const [songIndex, setSongIndex] = useState(8264);
     const [nextSong, setNextSong] = useState('');
     const [prevSong, setPrevSong] = useState('');
     const [colorOfSong, setColorOfSong] = useState('white');
@@ -28,8 +27,8 @@ export const MusicPlayerProvider = ({ children }) => {
     const [numSongs, setNumSongs] = useState(0);
     const songRef = useRef(null);
 
-    // Seems to not work correctly without this effect, will test more on it later
-     useEffect(() => {
+
+    useEffect(() => {
         if (songRef.current) {
             // song.stopAsync();
             // song.unloadAsync();
@@ -37,8 +36,8 @@ export const MusicPlayerProvider = ({ children }) => {
             songRef.current.unloadAsync();
         }
     }, []);
-    
-     // Plays song
+
+     // Resume
      const resumeSong = async () => {
         try{
             await songRef.current.getStatusAsync();
@@ -56,12 +55,11 @@ export const MusicPlayerProvider = ({ children }) => {
         try {
             const status = await songRef.current.getStatusAsync();
             if (status.isLoaded && status.isPlaying) {
-                    await songRef.current.pauseAsync();
-                    setIsPlaying(false);
+                await songRef.current.pauseAsync();
+                setIsPlaying(false);
             }
         } catch (error) {
             console.log("Song could not be paused", error);
-
         }
     };
 
@@ -87,7 +85,7 @@ export const MusicPlayerProvider = ({ children }) => {
         }
     };
 
-    // Milliseconds -> (minutes/seconds)
+    // milliseconds -> (minutes / seconds)
     const time = (millis) => {
         const minutes = Math.floor(millis / 60000);
         const seconds = Math.floor((millis % 60000) / 1000);
@@ -115,7 +113,7 @@ export const MusicPlayerProvider = ({ children }) => {
                 const songPath = album.songs.path[i];
                 try {
                     const {sound: newSound} = await Audio.Sound.createAsync(songPath);
-                    downloadedMusic[songTitle] = newSound; // save title as key for easy access to audio 
+                    downloadedMusic[songTitle] = newSound; // save title as key for easy access
                     console.log(`Successfully downloaded: ${songTitle} (${songsDownloaded++} / ${totalSongsToDownload})`);
                 } catch (error) { 
                     console.log("Could not download all music ", error);
@@ -123,7 +121,7 @@ export const MusicPlayerProvider = ({ children }) => {
 
             };
         }
-        setDownloadedList(downloadedMusic); // Store downloaded songs to access later
+        setDownloadedList(downloadedMusic); 
     };
 
     // Pre-load all music at start up, probably change
@@ -133,7 +131,6 @@ export const MusicPlayerProvider = ({ children }) => {
         preLoadMusic();
     }, []);
 
-    // Index specific, so function is put inside useEffect
     useEffect(() => {
 
         // Play selected audio file
@@ -159,7 +156,7 @@ export const MusicPlayerProvider = ({ children }) => {
             audioToPlay[songIndex].setOnPlaybackStatusUpdate((status) => {
                 if (status.isLoaded) {
                     setPlaybackPos(status.positionMillis);
-                    setPlaybackDuration(status.durationMillis);
+                    setPlaybackDuration(status.durationMillis); // Get duration for every song, put in an array, .map through it and put length next to song.
                     // When song finishes, go to next song
                     // by updating index
                     if (status.didJustFinish) {
@@ -178,7 +175,7 @@ export const MusicPlayerProvider = ({ children }) => {
     }, [songIndex]);
 
     return (
-        // Some are not needed, will go through it later
+        // CUT SOME OF THE VALUES! Some are not even used
         <MusicPlayerContext.Provider
             value={{
                 currentSongList,
@@ -192,19 +189,22 @@ export const MusicPlayerProvider = ({ children }) => {
                 songRef,
                 album,
                 numSongs,
-                nameOfSongMP3,
                 albumCover,
                 nextSong,
                 prevSong,
                 colorOfSong,
+                downloadedList,
+                audioToPlay,
                 time,
                 resumeSong,
                 pauseSong,
-                saveSong,
                 skipForward,
                 goBack,
                 scroller,
+                changeSongList,
+                setChangeSongList,
                 setColorOfSong,
+                setAudioToPlay,
                 setNextSong,
                 setPrevSong,
                 setNumSongs,
@@ -213,7 +213,6 @@ export const MusicPlayerProvider = ({ children }) => {
                 setNameOfSong,
                 setNameOfAlbum,
                 setNameOfArtist,
-                setNameOfSongMP3,
                 setSongIndex,
                 setIsPlaying,
                 setPlaybackPos,
@@ -229,4 +228,5 @@ export const MusicPlayerProvider = ({ children }) => {
 export const useMusicPlayer = () => {
     return useContext(MusicPlayerContext);
 };
+
 
