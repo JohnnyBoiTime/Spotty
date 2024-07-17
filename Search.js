@@ -41,15 +41,12 @@ const Search = () => {
                 </Pressable>;
                 
             }}>
-                {useIcon && (
                 <Menu.OptionGroup title="Search by:" value={useIcon} onChange={(value) => changeIcon(value)} defaultValue="person-sharp" type="radio" >
                 <Menu.ItemOption value="person-sharp"><Text style={styles.textColor}>Artist</Text></Menu.ItemOption>
                 <Menu.ItemOption value="disc-sharp"><Text style={styles.textColor}>Album</Text></Menu.ItemOption>
                 <Menu.ItemOption value="musical-notes-sharp"><Text style={styles.textColor}>Song</Text></Menu.ItemOption>
                 </Menu.OptionGroup>
-                )}
                 </Menu>
-
                 </Box> 
             }  
             color="white"
