@@ -22,4 +22,6 @@ TO DO LIST (For front-end):
 
 -Add progress bar/number on screen for downloaded music / music that still needs to be downloaded so user can see progress
 
+-Potentially implement caching for the songs to improve performance
+
 -Other stuff
