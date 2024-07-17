@@ -9,7 +9,8 @@ node GenerateAlbum.js generates album from directories in assets, so make sure a
 
 TO DO LIST (For front-end):
 
--Make it so selected songs chage color
+~~-Make it so selected songs chage color~~ (Done 7/17/2024)
+    - Make it more specific to avoid same song name conflicts, and also maybe add a button next to the song playing
 
 -Make it so user can make playlists
 
