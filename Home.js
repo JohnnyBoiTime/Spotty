@@ -17,23 +17,15 @@ const Home = ({navigation}) => {
         setAlbumCover,
     } = useMusicPlayer();
 
-    
     // Set info for the chosen album
     const albumDetails = (album) => {
-        // Get audio for selected songs:
-        const updateSongList = album.songs.title.map(songTitle => downloadedList[songTitle]);
-        setAudioToPlay(updateSongList);
-
-        // Other info for chosen album
         setNameOfAlbum(album.title);
         setNumSongs(album.songs.title.length);
         setAlbumCover(album.cover);
         setNameOfArtist(album.artist);
-        setCurrentSongList(album.songs);
+        setChangeSongList(album.songs);
         navigation.navigate("AlbumContents");
     };
-
-
 
     return (
         // Cool gradient background
