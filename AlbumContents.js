@@ -22,8 +22,9 @@ const InsideTheAlbum = () => {
     // Changes index to change song so useEffect can work
     const handleSongChange = (index) => {
 
+        // Makes it so music player shows information based on currently playing album
+        // instead of the album the user is currently viewing
         setCurrentSongList(changeSongList);
-        // Get audio for selected songs once user taps on song
         const updateSongList = changeSongList.title.map(songTitle => downloadedList[songTitle]);
         setAudioToPlay(updateSongList);
         setSongIndex(index);
