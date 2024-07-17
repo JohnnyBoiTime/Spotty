@@ -24,4 +24,6 @@ TO DO LIST (For front-end):
 
 -Potentially implement caching for the songs to improve performance
 
+-Improve phone experience (when using phone device and not emulator)
+
 -Other stuff
