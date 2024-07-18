@@ -27,4 +27,6 @@ TO DO LIST (For front-end):
 
 -Improve phone experience (when using phone device and not emulator)
 
+-Add shuffling music
+
 -Other stuff
