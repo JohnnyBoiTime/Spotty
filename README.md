@@ -1,5 +1,7 @@
 A music storage system where you can store and play music. Still being worked on.
 
+REWRITING IN TYPESCRIPT AS OF 7/18/2024
+
 HOW TO USE (SO FAR):
 
 Put albums in folders, must be in bandcamp format.
