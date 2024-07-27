@@ -21,7 +21,8 @@ const initialState: AlbumState = {
     nameOfSong: '',
     nameOfAlbum: '',
     nameOfArtist: '',
-    albumCover: 8965,
+    // Set to 8965 to not conflict with other album paths
+    albumCover: 8965, 
     numSongs: 0,
 };
 
