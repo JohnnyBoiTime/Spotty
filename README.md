@@ -1,34 +1,17 @@
 A music storage system where you can store and play music. Still being worked on.
 
-REWRITING IN TYPESCRIPT AS OF 7/18/2024
+Originally in javascript, started re-writing into typescript in 7/18/2024
+Re-wrote in typescript in 7/26/2024
 
-HOW TO USE (SO FAR):
+Features:
+- Make playlists
+- Store songs locally on device
+- Music player that is present around the app allows user to skip, go to previous, pause, play, and seek through currently playing songs.
+- Generate albums simply by placing an album folder with songs into assets and running node GenerateAlbums.js
+- Search through songs
 
-Put albums in folders, must be in bandcamp format.
-
-node GenerateAlbum.js generates album from directories in assets, so make sure album is in a file that is the name of the album.
-
-
-TO DO LIST (For front-end):
-
-~~-Make it so selected songs chage color~~ (Done 7/17/2024)
-    - Make it more specific to avoid same song name conflicts, and also maybe add a button next to the song playing
-
--Make it so user can make playlists
-
--Make it so user can search for songs that are downloaded
-
--Make log in screen work, as well as create account and forgot password
-
-~~Improve song loading and playing times, maybe pre-load the music?~~ (Done 7/15/2024, pre-downloads music) 
-    -IMPROVE LOADING TIMES SOMEHOW (CHUNKS? PARALLEL?)
-
--Add progress bar/number on screen for downloaded music / music that still needs to be downloaded so user can see progress
-
--Potentially implement caching for the songs to improve performance
-
--Improve phone experience (when using phone device and not emulator)
-
--Add shuffling music
-
--Other stuff
+Uses:
+- React Redux and useContext, although redux is more heavily used
+- React native elements for UI
+- Various expo libraries for audio and sending files ot device
+- AsyncStorage to store songs locally
