@@ -14,4 +14,4 @@ Uses:
 - React Redux and useContext, although redux is more heavily used
 - React native elements for UI
 - Various expo libraries for audio and sending files ot device
-- AsyncStorage to store songs locally
+- AsyncStorage
