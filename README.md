@@ -1,7 +1,8 @@
 A music storage system where you can store and play music. Still being worked on.
 
-Originally in javascript, started re-writing into typescript in 7/18/2024
-Re-wrote in typescript in 7/26/2024
+Originally in javascript, started re-writing into typescript in 7/18/2024 and
+
+Finished in 7/26/2024
 
 Features:
 - Make playlists
@@ -16,3 +17,6 @@ Uses:
 - Various expo libraries for audio and sending files ot device
 - AsyncStorage
 - React navigation
+
+Notes:
+- When music is playing and music player is active, app becomes really slow
