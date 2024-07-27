@@ -19,4 +19,4 @@ Uses:
 - React navigation
 
 Notes:
-- When music is playing and music player is active, app becomes really slow
+- When music is playing and music player is active, app becomes really slow, probably implement headless js
