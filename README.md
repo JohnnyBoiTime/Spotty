@@ -15,3 +15,4 @@ Uses:
 - React native elements for UI
 - Various expo libraries for audio and sending files ot device
 - AsyncStorage
+- React navigation
