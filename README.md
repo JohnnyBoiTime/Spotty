@@ -1,4 +1,4 @@
-A music storage system where you can store and play music. Still being worked on. Original name was spotty, but changed to Jammi
+A music storage system where you can store and play music. Still being worked on. Original name was spotty, but changed to Jammi. 
 
 Originally in javascript, started re-writing into typescript in 7/18/2024 and
 
