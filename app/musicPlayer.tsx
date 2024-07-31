@@ -3,10 +3,11 @@ import React, {useState} from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { Icon, Card, Slider, Dialog, ButtonGroup, Input, Button, Image } from "@rneui/themed";
 import { Ionicons } from "@expo/vector-icons";
-import { RootState, AppDispatch } from "@/store";
+import { RootState, AppDispatch } from "@/store"
 import { useAudio } from "./context";
 import { addSongToPlaylist, createPlaylist} from "@/store/slices/playlistSlice";
-
+import { TapGestureHandler, PanGestureHandler, PanGestureHandlerGestureEvent, HandlerStateChangeEvent } from "react-native-gesture-handler";
+import Animated, {useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
 
 // Interfaces
 interface Song {
@@ -37,6 +38,40 @@ const MusicPlayer: React.FC = () => {
   const [playlistName, setPlaylistName] = useState('');
   const [songName, setSongName] = useState('');
   const [visible, setVisible] = useState(false);
+  const yDir = useSharedValue(0);
+  
+
+  // Coneals/displays music player and keeps it in bounds
+  const swiping = (event: PanGestureHandlerGestureEvent) => {
+
+      yDir.value = event.nativeEvent.absoluteY;
+      console.log(yDir.value);
+    if (event.nativeEvent.absoluteY < 650) {
+      yDir.value = 650;
+    }
+    if (event.nativeEvent.absoluteY > 772) {
+      yDir.value = 772
+    }
+
+  };
+
+  // Open and close the player
+  const tapping = (event: HandlerStateChangeEvent) => {
+    if (yDir.value === 772 && event.nativeEvent.numberOfPointers === 1) {
+      yDir.value = withTiming(650);
+    }
+    if (yDir.value === 650 && event.nativeEvent.numberOfPointers === 1) {
+      yDir.value = withTiming(772);
+    }
+  }
+
+  // Allow touch movement for player
+  const animated = useAnimatedStyle(() => {
+    return {
+      transform: [{translateY: yDir.value}],
+      backgroundColor: 'transparent',
+    };
+  })
 
   // Prevents error if passed through function to scroller
   const songProgress = (value: number) => {
@@ -128,11 +163,14 @@ const MusicPlayer: React.FC = () => {
 };
 
  return (
-  <View style={{backgroundColor: 'black'}}>
-
+  
+    <PanGestureHandler onGestureEvent={swiping}>
+    <Animated.View style={[animated]} onPointerDown={(event) => console.log(event)}>
     {/* Show player if song is playing */}
     { playerState.isPlaying || albumState.nameOfSong ? ( 
-    <Card containerStyle={styles.card}>    
+    <Card containerStyle={styles.card}> 
+    <TapGestureHandler onActivated={tapping}>
+    <Animated.View>
     <View style={styles.view}>
     <Image style={styles.playerImage} key={albumState.albumCover} source={playerState.playerAlbumCover}/>
     <Card.FeaturedSubtitle numberOfLines={1} ellipsizeMode='tail' style={styles.cardSongTitle}>{albumState.nameOfSong}</Card.FeaturedSubtitle>
@@ -140,6 +178,8 @@ const MusicPlayer: React.FC = () => {
       <Icon color={'white'} name='save' onPress={() => showPlaylists(albumState.nameOfSong, playList.playlists)}/>
       </View>
     </View>  
+    </Animated.View>
+    </TapGestureHandler>
     <Card.Divider/>
     <View style={{flexDirection: 'row'}}>
     <Text style={{color: 'white'}}> {time(playerState.playbackPos)}</Text>
@@ -181,6 +221,7 @@ const MusicPlayer: React.FC = () => {
       <Ionicons name={ playerState.isPlaying ? 'pause': 'play'} />,
       <Ionicons name='play-skip-forward' />,
     ]}/>
+    {/* Playlist dialog */}
     <Dialog isVisible={visible}>
               <Dialog.Title title="Playlists:"/>
               <Input onChangeText={input}></Input>
@@ -193,9 +234,10 @@ const MusicPlayer: React.FC = () => {
           </Dialog>
     </Card>
   ) : (
-    <Text></Text>
+    <Text></Text> // Empty
    )}
-   </View>
+      </Animated.View>
+      </PanGestureHandler>
  );
 }
 
@@ -210,7 +252,6 @@ const styles = StyleSheet.create({
     },
     view: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
       padding: 5,
       flexWrap: 'wrap',
       
@@ -218,6 +259,8 @@ const styles = StyleSheet.create({
     card: {
       backgroundColor: 'black',
       height: 200,
+      width: 430,
+      margin: 0,
       borderColor: 'transparent',
 
     },
