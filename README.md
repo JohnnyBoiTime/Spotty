@@ -2,7 +2,7 @@ A music storage system where you can store and play music. Still being worked on
 
 Originally in javascript, started re-writing into typescript in 7/18/2024 and
 
-Finished in 7/26/2024
+Finished re-writing in 7/26/2024
 
 Features:
 -Playing music (WOW)
