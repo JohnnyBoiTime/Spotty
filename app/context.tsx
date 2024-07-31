@@ -168,6 +168,10 @@ export const AudioProvider = ({children} : {children: React.ReactNode}) => {
               if (status.isLoaded) {
                 dispatchRedux(setPlaybackPos(status.positionMillis));
                 dispatchRedux(setPlaybackDuration(status.durationMillis));
+                  if (status.didJustFinish) {
+                  const nextIndex = playerState.songIndex + 1;
+                  dispatchRedux(setSongIndex(nextIndex));
+                }
               }
             })
 
