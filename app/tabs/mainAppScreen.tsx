@@ -21,10 +21,11 @@ const MainAppScreen: React.FC = () => {
                 <Tabs.Navigator
                 tabBar={(props) => (
                     <>
-                    <View style={{backgroundColor: 'rgb(138, 0, 138)', padding: 0}}>
-                    <MusicPlayer/>
+                    <View style={{backgroundColor: 'black', position: 'absolute', height: 0}}>
+                        <MusicPlayer/>
                     </View>
-                    <BottomTabBar {...props} />
+                    <BottomTabBar style={{borderColor: 'black'}} {...props} />
+                    </>
                     </>
                 )} 
                 screenOptions={{
