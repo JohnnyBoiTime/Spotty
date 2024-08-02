@@ -7,8 +7,7 @@ import { RootState, AppDispatch } from "@/store";
 import {  setCurrentSongList } from "@/store/slices/songListSlice";
 import { setSongIndex, setIsPlaying, setPlayerAlbumCover } from "@/store/slices/playerSlice";
 import { createPlaylist, addSongToPlaylist } from "@/store/slices/playlistSlice";
-// https://reactnativeelements.com/docs
-
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Interfaces
 interface Song {
@@ -140,7 +139,6 @@ const InsideAlbum: React.FC = () => {
       console.log(error);
     }
   }
-  
 
   return (
       <LinearGradient
@@ -148,10 +146,11 @@ const InsideAlbum: React.FC = () => {
         locations={[0.3, 0.8, 0.99]} 
         style={styles.gradient}
       >
-       <Text style={styles.albumName} h1>{albumState.nameOfAlbum}</Text>
+        <SafeAreaView style={{alignItems: 'center'}}>
+       <Text h1>{albumState.nameOfAlbum}</Text>
         <Image style={styles.imageInfo} key={albumState.albumCover} source={albumState.albumCover}></Image>
         <Text h4 style={styles.artistName}>{albumState.nameOfArtist}</Text>
-          
+        </SafeAreaView>
         <ScrollView  contentContainerStyle={styles.scroll}>
       {songListState.changeSongList.map((item, index) => (
         <View  key={index} >
@@ -187,12 +186,8 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
   },
-  albumName: {
-   textAlign: 'center',
-  },
   artistName: {
     fontSize: 20,
-    textAlign: 'center',
   },
   songs: {
    width: '100%',
@@ -203,12 +198,10 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '100%',
-    flex: 1,
   },
   imageInfo: {
     width: 200,
     height: 200,
-    marginLeft: 100,
     resizeMode: 'cover',
 },
 });
