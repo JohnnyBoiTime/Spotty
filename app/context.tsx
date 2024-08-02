@@ -52,9 +52,45 @@ export const AudioProvider = ({children} : {children: React.ReactNode}) => {
     const songRef = useRef<Audio.Sound | null>(null);
 
     // Store files locally on device
-    const storage = async (filePath: string, fileName: string): Promise<string | null> => {
+    const songStorage = async (filePath: string, fileName: string): Promise<string | null> => {
     
       const songUri = `${FileSystem.documentDirectory}${fileName}.mp3`;
+
+        try {
+
+          // https://stackoverflow.com/questions/46915002/argument-of-type-string-null-is-not-assignable-to-parameter-of-type-string
+
+          // Make directory
+          const directory = await FileSystem.getInfoAsync(FileSystem.documentDirectory || '{}');
+          if (!directory.exists) {
+            await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory || '{}');
+          }
+
+          // Does it exist?
+          const itExists = await AsyncStorage.getItem(fileName);
+          if (itExists) {
+            return itExists
+          }
+
+          // Doesn't exist, copy files
+          await FileSystem.copyAsync({
+            from: filePath,
+            to: songUri,
+          });
+
+          // set key and store
+          await AsyncStorage.setItem(fileName, songUri);
+          console.log(`Copied/Stored: ${songUri}`);
+          return songUri;
+        } catch (error) {
+          console.error(`Could not copy and store: ${error} to ${songUri}`);
+          return null;
+        }
+      };
+
+      const albumStorage = async (albumPath: string, fileName: string): Promise<string | null> => {
+        
+        const albumUri = `${FileSystem.documentDirectory}${fileName}.jpg`;
 
         try {
 
@@ -75,19 +111,19 @@ export const AudioProvider = ({children} : {children: React.ReactNode}) => {
 
           // Doesn't exist, copy files
           await FileSystem.copyAsync({
-            from: filePath,
-            to: songUri,
+            from: albumPath,
+            to: albumUri,
           });
 
           // set key and store
-          await AsyncStorage.setItem(fileName, songUri);
-          console.log(`Copied/Stored: ${songUri}`);
-          return songUri;
+          await AsyncStorage.setItem(fileName, albumUri);
+          console.log(`Copied/Stored: ${albumUri}`);
+          return albumUri;
         } catch (error) {
-          console.error(`Could not copy and store: ${error} to ${songUri}`);
+          console.error(`Could not copy and store: ${error} to ${albumUri}`);
           return null;
         }
-      };
+      }
 
     // Load from generated files
     const loadSongList = async (): Promise<void> => {
@@ -104,15 +140,20 @@ export const AudioProvider = ({children} : {children: React.ReactNode}) => {
             for (let i = 0; i < album.songs.title.length; i++) {
                 const songTitle = album.songs.title[i];
                 const songPath = album.songs.path[i];
-
+                const albumCover = album.cover;
+                const albumTitle = album.title;
                 try {
+                  const downloadAlbumCover = Asset.fromModule(albumCover);
                   const downloadsong = Asset.fromModule(songPath);
                   await downloadsong.downloadAsync();
+                  await downloadAlbumCover.downloadAsync();
                   const pathToSong = downloadsong.localUri || downloadsong.uri;
-                  await storage(pathToSong, songTitle);
+                  const pathToAlbum = downloadAlbumCover.localUri || downloadAlbumCover.uri;
+                  await songStorage(pathToSong, songTitle);
+                  await albumStorage(pathToAlbum, albumTitle);
            //       console.log(`Successfully downloaded ${songTitle} (${i + 1} / ${totalSongsToDownload})`)
                   } catch (error) { 
-                    console.log("Could not download all music ", error);
+                    console.log("Could not download all music/albums ", error);
                }
             }
         }
@@ -168,7 +209,7 @@ export const AudioProvider = ({children} : {children: React.ReactNode}) => {
               if (status.isLoaded) {
                 dispatchRedux(setPlaybackPos(status.positionMillis));
                 dispatchRedux(setPlaybackDuration(status.durationMillis));
-                  if (status.didJustFinish) {
+                if (status.didJustFinish) {
                   const nextIndex = playerState.songIndex + 1;
                   dispatchRedux(setSongIndex(nextIndex));
                 }
@@ -233,6 +274,3 @@ export const AudioProvider = ({children} : {children: React.ReactNode}) => {
         </AudioContext.Provider>
     );
 };
-
-
-
