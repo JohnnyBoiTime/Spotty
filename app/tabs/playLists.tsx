@@ -8,8 +8,6 @@ import { setPlayList } from "@/store/slices/playlistSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ScrollView } from "react-native";
 
-// https://reactnativeelements.com/docs
-
 interface Song {
   title: string;
   artist: string;
@@ -28,7 +26,6 @@ const PlayLists: React.FC = ({navigation}: any) => {
   
   const insidePlaylist = (playlistName: string) => {
 
-
     const findPlaylistMatch: Playlist | undefined = playlist.playlists.find((name) => name.nameOfPlaylist === playlistName); // Finds name of playlist
 
    // Must check if it is undefined
@@ -46,6 +43,7 @@ const PlayLists: React.FC = ({navigation}: any) => {
         locations={[0.3, 0.8, 0.99]} 
         style={styles.gradient}
       >
+        <SafeAreaView>
         <ScrollView>
           {playlist.playlists.map((playlist, index) => (
             <View key={index} style={{flexDirection: 'row'}}>
@@ -56,7 +54,7 @@ const PlayLists: React.FC = ({navigation}: any) => {
             </View>
           ))}
         </ScrollView>
-    
+        </SafeAreaView>
     </LinearGradient>
   );
 }
