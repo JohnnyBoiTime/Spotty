@@ -1,19 +1,15 @@
-import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { View, StyleSheet, FlatList, TouchableOpacity, SafeAreaView } from "react-native";
 import React, {useState} from 'react';
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { createTheme, darkColors, Text, CheckBox, Card, Input, lightColors, ThemeProvider, Button, SearchBar, Header, ListItem } from "@rneui/themed";
+import { Text, CheckBox, SearchBar} from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { importedAlbums } from "../generatedFiles/Albums";
-import { Ionicons } from "@expo/vector-icons";
-import { setNameOfSong, setNumSongs } from "@/store/slices/albumSlice";
+import { setNumSongs } from "@/store/slices/albumSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
 import { setCurrentSongList } from "@/store/slices/songListSlice";
 import { useAudio } from "../context";
-import { ListItemInput } from "@rneui/base/dist/ListItem/ListItem.Input";
-
-// https://reactnativeelements.com/docs
 
 const Search: React.FC = () => {
 
@@ -45,10 +41,10 @@ const Search: React.FC = () => {
 
   const changeSongColor = (name: string) => name === albumState.nameOfSong ? 'black' : 'white';
   
-
   const handleSongChange = (song: string, index: number) => {
     dispatch(setCurrentSongList([song]))
     dispatch(setNumSongs(1));
+    playSong(song, index);
   }
 
 
@@ -63,7 +59,7 @@ const Search: React.FC = () => {
               <Text h4> {item.title}</Text>
               {item.songs.title.map((song, index) => (
                 <TouchableOpacity key={index} onPress={() => handleSongChange(song, index)}>
-                  <Text style={{color:changeSongColor(item.title)}} >{song}</Text>
+                  <Text style={{color:changeSongColor(song)}} >{song}</Text>
                 </TouchableOpacity>
               ))}
             </View> 
@@ -110,17 +106,19 @@ const Search: React.FC = () => {
         locations={[0.3, 0.8, 0.99]} 
         style={styles.gradient}
       >
+        <SafeAreaView style={{borderColor: 'transparent'}}>
         <SearchBar
       placeholder="Search"
       onChangeText={updateSearch}
       value={searching}
-      containerStyle={{backgroundColor: 'transparent', borderColor: 'transparent'}}
-      style={{backgroundColor: 'transparent'}}
+      containerStyle={{backgroundColor: 'transparent',}}
+      style={{backgroundColor: 'transparent', borderColor: 'transparent'}}
       clearIcon
       round
       rightIcon={{name: 'book'}}
       searchIcon={{onPress: handlePress}}
     />
+    </SafeAreaView>
     <View style={{flexDirection: 'row'}}>
     {/* Checkbox for choices */}
   <CheckBox
