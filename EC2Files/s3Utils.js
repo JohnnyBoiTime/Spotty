@@ -1,10 +1,10 @@
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 const clientParams = { region: '***' };
 const client = new S3Client(clientParams);
 
-const getPresignedURL = async (bucketName, key, expiresIn = 3600) => {
+const getPresignedUrlForDownload = async (bucketName, key, expiresIn = 3600) => {
         //getObjectCommand using the paramters bucketName and key
         const command = new GetObjectCommand({Bucket: bucketName, Key: key,});
 
@@ -22,6 +22,34 @@ const getPresignedURL = async (bucketName, key, expiresIn = 3600) => {
         }
 };
 
+
+const getPresignedUrlForUpload = async ( bucketName, key, expiresIn = 3600) => {
+        const command = new PutObjectCommand({ Bucket: bucketName, Key: key, ContentType: 'application/octet-stream' });
+
+        try {
+                const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+                return url;
+        }
+        catch(err) {
+                console.error('Couldn\'t generate presigned URL', err);
+                throw err;
+        }
+};
+
+const deleteFile = async (bucketParams) => {
+        //Folowing code from https://docs.aws.amazon.com/AmazonS3/latest/userguide/delete-objects.html
+
+        try {
+                const data = await client.send(new DeleteObjectCommand(bucketParams));
+                return data;
+        } catch (err) {
+                console.error("Error: ", err);
+                throw err;
+        }
+};
+
 module.exports = {
-        getPresignedURL,
+        getPresignedUrlForDownload,
+        getPresignedUrlForUpload,
+        deleteFile
 };
