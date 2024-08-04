@@ -1,5 +1,5 @@
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command } = require("@aws-sdk/client-s3");
 
 const clientParams = { region: '***' };
 const client = new S3Client(clientParams);
@@ -52,8 +52,54 @@ const deleteFile = async (bucketParams) => {
         }
 };
 
+//search for a file with a specific name
+const search = async (bucketName, fileName) => {
+
+        //since ListObjectsV2Command returns 1000 objects, isTruncated tells whether
+        //it needs to search more
+        let isTruncated = true;
+        //contToken is the continuationToken that tells ListObjectsV2 command where
+        //to continue listing objects
+        let contToken = null;
+        //results will be returned. It stores all files with fileName, including
+        //the ones in folders
+        let results = [];
+
+        while (isTruncated == true) {
+                //create input parameters
+                const inputParams = {
+                        Bucket: bucketName,
+                        ContinuationToken: contToken
+                }
+
+                try {
+                        //retrieve data from S3 bucket
+                        const data = await client.send(new ListObjectsV2Command(inputParams));
+
+                        //extract Contents array from data
+                        const contents = data.Contents;
+
+                        //filter out all items which their keys dont end in fileNanme
+                        const filteredRes = contents.filter(item => item.Key.endsWith(fileName));
+                        //add these filtered items to results
+                        results = results.concat(filteredRes);
+
+                        //update isTruncated and contToken
+                        isTruncated = data.IsTruncated;
+                        contToken = data.NextContinuationToken;
+
+                } catch (err) {
+                        console.error("Error: ", err);
+                        throw err;
+                }
+        }
+
+        return results;
+};
+
 module.exports = {
         getPresignedUrlForDownload,
         getPresignedUrlForUpload,
-        deleteFile
+        deleteFile,
+        search
 };
