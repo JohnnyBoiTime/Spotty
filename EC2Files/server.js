@@ -1,5 +1,5 @@
 const express = require('express');
-const{getPresignedUrlForDownload, getPresignedUrlForUpload, deleteFile} = require('./s3Utils');
+const{getPresignedUrlForDownload, getPresignedUrlForUpload, deleteFile, search} = require('./s3Utils');
 const app = express();
 const port = 3000;
 const PASSWORD = '***';
@@ -9,6 +9,7 @@ const bucketName = '***';
 
 app.use(express.json());
 
+
 //app.get downloads a file from the S3, with the path to the file in t he S3 being the key
 app.get('/download', async (req, res) => {
         const key = req.query.key;
@@ -16,6 +17,7 @@ app.get('/download', async (req, res) => {
         if(!key) {
                 return res.status(400).send("Key is missing");
         }
+
 
         try {
                 //return presigned URL
@@ -72,6 +74,25 @@ app.delete('/delete', async (req, res) => {
                 //http response saying there was an error
                 res.status(500).json({error: err});
         }
+});
+
+app.get('/search', async (req, res) => {
+        const key = req.query.key;
+
+        if(!key) {
+                return res.status(400).send("Key is missing");
+        }
+
+        try {
+                data = await search(bucketName, key);
+                //print success to console
+                console.log("Objects found: ", data);
+                //print response
+                res.status(200).json({data: data});
+        } catch (err) {
+                res.status(500).json({error: err});
+        }
+
 });
 
 app.listen(port, (err) => {
