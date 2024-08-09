@@ -26,7 +26,6 @@ const MainAppScreen: React.FC = () => {
                     </View>
                     <BottomTabBar style={{borderColor: 'black'}} {...props} />
                     </>
-                    </>
                 )} 
                 screenOptions={{
                     headerShown: false, 
