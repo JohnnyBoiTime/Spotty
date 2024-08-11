@@ -8,6 +8,7 @@ import { useAudio } from "./context";
 import { addSongToPlaylist, createPlaylist} from "@/store/slices/playlistSlice";
 import { TapGestureHandler, PanGestureHandler, PanGestureHandlerGestureEvent, HandlerStateChangeEvent } from "react-native-gesture-handler";
 import Animated, {useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
+import { setIsPlaying, setSongIndex, setIsOpen } from "@/store/slices/playerSlice";
 
 // Interfaces
 interface Song {
@@ -34,20 +35,23 @@ const MusicPlayer: React.FC = () => {
   const albumState = useSelector((state: RootState) => state.album);
   const playerState = useSelector((state: RootState) => state.player);
   const playList = useSelector((state: RootState) => state.playlist);
-  const {playSong, pauseSong, scroller, resumeSong, skipSong, prevSong} = useAudio();
+  const {pauseSong, scroller, resumeSong, skipSong, prevSong} = useAudio();
   const [playlistName, setPlaylistName] = useState('');
   const [songName, setSongName] = useState('');
   const [visible, setVisible] = useState(false);
-  const yDir = useSharedValue(0);
+  const [tapButton, setTapButton] = useState(false);
+  const yDir = useSharedValue(650);
+
+  // Possible do useState to re-render all the components when
+  // yDir equals something
   
 
   // Coneals/displays music player and keeps it in bounds
   const swiping = (event: PanGestureHandlerGestureEvent) => {
-
       yDir.value = event.nativeEvent.absoluteY;
-      console.log(yDir.value);
     if (event.nativeEvent.absoluteY < 650) {
       yDir.value = 650;
+
     }
     if (event.nativeEvent.absoluteY > 772) {
       yDir.value = 772
@@ -57,11 +61,17 @@ const MusicPlayer: React.FC = () => {
 
   // Open and close the player
   const tapping = (event: HandlerStateChangeEvent) => {
-    if (yDir.value === 772 && event.nativeEvent.numberOfPointers === 1) {
+
+    // Opened
+    if (yDir.value == 772 && tapButton == false && event.nativeEvent.numberOfPointers === 1) {
       yDir.value = withTiming(650);
+      dispatch(setIsOpen(true));
     }
-    if (yDir.value === 650 && event.nativeEvent.numberOfPointers === 1) {
+    else {
+      // Closed
       yDir.value = withTiming(772);
+      dispatch(setIsOpen(false));
+    
     }
   }
 
@@ -78,6 +88,13 @@ const MusicPlayer: React.FC = () => {
     scroller(value);
   };
 
+  const nextSong = (value: number) => {
+    if (value == 1) {
+      const nextIndex = playerState.songIndex + 1;
+      dispatch(setSongIndex(nextIndex));
+    }
+  }
+
   const showPlaylists = (songTitle: string, list: any) =>{
     setSongName(songTitle);
     setVisible(true);
@@ -85,9 +102,22 @@ const MusicPlayer: React.FC = () => {
 
   // Changes text input
   const input = (inputted: string,) =>{
-    setPlaylistName(inputted);
+     setPlaylistName(inputted);
   };
 
+  const handlePlayPause = () => {
+    setTapButton(true);
+    if (playerState.isPlaying == true) {
+      console.log("Song is playing!");
+      pauseSong();
+      dispatch(setIsPlaying(false));
+    }
+    else {
+      console.log("Song is NOT playing!");
+      resumeSong();
+      dispatch(setIsPlaying(true));
+    }
+  }
 
   const saveSongTap = (playlist: string) => {
 
@@ -116,6 +146,7 @@ const MusicPlayer: React.FC = () => {
   const saveSong = (songTitle: string) => {
     try {
 
+      setTapButton(true);
       // Format for playlist
       const playListEntry: Playlist = 
         {
@@ -174,9 +205,17 @@ const MusicPlayer: React.FC = () => {
     <View style={styles.view}>
     <Image style={styles.playerImage} key={albumState.albumCover} source={playerState.playerAlbumCover}/>
     <Card.FeaturedSubtitle numberOfLines={1} ellipsizeMode='tail' style={styles.cardSongTitle}>{albumState.nameOfSong}</Card.FeaturedSubtitle>
-      <View>
-      <Icon color={'white'} name='save' onPress={() => showPlaylists(albumState.nameOfSong, playList.playlists)}/>
-      </View>
+          <Icon color={'white'} name='save' onPress={() => showPlaylists(albumState.nameOfSong, playList.playlists)}/>    
+        { playerState.isOpen ? (
+          <Icon color={'white'} name='save' onPress={() => showPlaylists(albumState.nameOfSong, playList.playlists)}/>    
+        ) : (
+          <View style={{flexDirection: 'row'}}>
+          <Icon color={'white'} name='save' onPress={() => showPlaylists(albumState.nameOfSong, playList.playlists)}/>    
+          <Ionicons size={25} color={'white'} name={playerState.isPlaying ? 'pause' : 'play'} onPress={() => handlePlayPause() }/>
+          <Ionicons size={25} color={'white'} name={'arrow-up'} onPress={() => setTapButton(false) }/>
+        </View>
+        )
+      }
     </View>  
     </Animated.View>
     </TapGestureHandler>
@@ -190,6 +229,7 @@ const MusicPlayer: React.FC = () => {
     value={playerState.playbackPos / playerState.playbackDuration || 0}
     minimumValue={0}
     maximumValue={1}
+    onSlidingComplete={nextSong}
     step={0.001}
     onValueChange={songProgress}
     thumbStyle={styles.thumb}
