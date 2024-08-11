@@ -1,5 +1,5 @@
-import { View, StyleSheet, ScrollView} from "react-native";
-import React, {useState, useEffect} from 'react';
+import { View, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent} from "react-native";
+import React, {useState, useEffect, useRef} from 'react';
 import {  Text, Dialog, Icon, Input, Button, Image, } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,6 +8,8 @@ import {  setCurrentSongList } from "@/store/slices/songListSlice";
 import { setSongIndex, setIsPlaying, setPlayerAlbumCover } from "@/store/slices/playerSlice";
 import { createPlaylist, addSongToPlaylist } from "@/store/slices/playlistSlice";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {useSharedValue} from 'react-native-reanimated';
+
 
 // Interfaces
 interface Song {
@@ -37,6 +39,8 @@ const InsideAlbum: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [playlistName, setPlaylistName] = useState('');
   const [songName, setSongName] = useState('');
+  const yDir = useSharedValue(0);
+
 
   // Stores chosen song info to display
   const handleSongChange = ( index: number) => {
@@ -45,6 +49,15 @@ const InsideAlbum: React.FC = () => {
     dispatch(setIsPlaying(true));
     dispatch(setSongIndex(index));
   };
+
+  // Get position to know when the scroller is at the end
+  // Maybe add animation thta coincides with music player being opened
+  // so there isn't just a square over the songs when you open it not at the end
+  // FIX TIME BECAUSE THE END TIME ISNT ALIGNED WITH THE RIGHT ITS OFF AAAAAAAA
+  const scrollerPosition = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const {contentOffset} = event.nativeEvent;
+    yDir.value = Math.floor(contentOffset.y);
+  }
 
    // Changes song color based on name, potential problem
     // if there are 2 songs with the same name, probably
@@ -151,7 +164,7 @@ const InsideAlbum: React.FC = () => {
         <Image style={styles.imageInfo} key={albumState.albumCover} source={albumState.albumCover}></Image>
         <Text h4 style={styles.artistName}>{albumState.nameOfArtist}</Text>
         </SafeAreaView>
-        <ScrollView  contentContainerStyle={styles.scroll}>
+        <ScrollView onScroll={scrollerPosition} contentContainerStyle={[styles.scroll]} contentOffset={{ x: 0, y: playerState.isOpen && yDir.value == 244 ? 360 : yDir.value}}>
       {songListState.changeSongList.map((item, index) => (
         <View  key={index} >
         <Button onPress={() => handleSongChange(index)} style={styles.button} color='transparent'>
@@ -174,6 +187,7 @@ const InsideAlbum: React.FC = () => {
         </View>
       ))}
       </ScrollView>
+      <View style={{height: playerState.isOpen ? 190 : 75}}></View>
     </LinearGradient>
     
   );
@@ -182,6 +196,7 @@ const InsideAlbum: React.FC = () => {
 const styles = StyleSheet.create({
   scroll: {
     alignItems: 'flex-start',
+    paddingEnd: 15,
   },
   gradient: {
     flex: 1,
