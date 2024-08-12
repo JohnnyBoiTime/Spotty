@@ -49,10 +49,9 @@ const Search: React.FC = ({navigation}: any) => {
   const changeSongColor = (name: string) => name === albumState.nameOfSong ? 'black' : 'white';
   
   const handleSongChange = (song: string, index: number) => {
-    const albumCover = importedAlbums.map(album => album);
 
     // Finds albm cover using song title
-    for (const cover of albumCover) {
+    for (const cover of importedAlbums) {
       const songIndex = cover.songs.title.indexOf(song);
       if (songIndex !== -1) {
         console.log(cover.cover);
