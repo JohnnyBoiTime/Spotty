@@ -5,15 +5,26 @@ import { RootState } from "@/store";
 import { Text, CheckBox, SearchBar} from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { importedAlbums } from "../generatedFiles/Albums";
-import { setNumSongs } from "@/store/slices/albumSlice";
+import { setNameOfAlbum, setNumSongs, setAlbumCover, setNameOfArtist, } from "@/store/slices/albumSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
-import { setCurrentSongList } from "@/store/slices/songListSlice";
+import { setChangeSongList, setCurrentSongList, SongList } from "@/store/slices/songListSlice";
 import { useAudio } from "../context";
+import { setPlayerAlbumCover } from "@/store/slices/playerSlice";
 
-const Search: React.FC = () => {
+// Format of album
+interface Album {
+  title: string;
+  cover: number;
+  artist: string;
+  songs: {
+    title: string[];
+    path: number[];
+  };
+}
 
-  const [showPassword, setShowPassword] = useState(false);
+const Search: React.FC = ({navigation}: any) => {
+
   const [searching, setSearching] = useState('');
   const [searchChoice, setSearchChoice] = useState(0);
   const [filter, setFilter] = useState(['']);
@@ -31,20 +42,42 @@ const Search: React.FC = () => {
     const more = importedAlbums.map(album => album.songs.title.flat(1));
     const singleList = more.flat(1);
     setFilter(singleList.filter((song) => song.toLowerCase().includes(searcher.toLowerCase())));
-   console.log(filter);
-  };
-
-  const handlePress = () => {
-    console.log("Pressed");
+    console.log(filter);
     
-  }
+  };
 
   const changeSongColor = (name: string) => name === albumState.nameOfSong ? 'black' : 'white';
   
   const handleSongChange = (song: string, index: number) => {
+    const albumCover = importedAlbums.map(album => album);
+
+    // Finds albm cover using song title
+    for (const cover of albumCover) {
+      const songIndex = cover.songs.title.indexOf(song);
+      if (songIndex !== -1) {
+        console.log(cover.cover);
+        dispatch(setAlbumCover(cover.cover));
+      }
+    }
     dispatch(setCurrentSongList([song]))
     dispatch(setNumSongs(1));
     playSong(song, index);
+  }
+
+  // Fills in "identifying" info for album
+  const goToAlbum = (album: Album ) => {
+    dispatch(setNameOfAlbum(album.title))
+    dispatch(setNumSongs(album.songs.title.length));
+    dispatch(setAlbumCover(album.cover));
+    dispatch(setNameOfArtist(album.artist));
+  
+    // Map song titles
+    const songList: SongList[] = album.songs.title.map((title, index) => ({
+      title,
+      path: album.songs.path[index],
+     }));
+    dispatch(setChangeSongList(songList));
+    navigation.navigate("AlbumContents");
   }
 
 
@@ -90,7 +123,9 @@ const Search: React.FC = () => {
         data={importedAlbums}
         renderItem = {({item, index}) => (
           <View key={index}>
-                <Text style={{color:changeSongColor(albumState.nameOfSong)}} h1>{item.title}</Text>
+                <TouchableOpacity onPress={() => goToAlbum(item)}>
+                <Text style={{color: 'black'}} h1>{item.title}</Text>
+                </TouchableOpacity>
           </View> 
         )}
         />;
@@ -116,7 +151,6 @@ const Search: React.FC = () => {
       clearIcon
       round
       rightIcon={{name: 'book'}}
-      searchIcon={{onPress: handlePress}}
     />
     </SafeAreaView>
     <View style={{flexDirection: 'row'}}>
