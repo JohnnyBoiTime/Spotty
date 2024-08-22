@@ -1,95 +1,55 @@
-import {  View, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from "react-native";
 import React from 'react';
-import { useDispatch, } from "react-redux";
-import { Image } from "@rneui/themed";
-import { LinearGradient } from "expo-linear-gradient";
-import { importedAlbums } from "../generatedFiles/Albums";
-import { AppDispatch } from "@/store";
-import { setNameOfAlbum, setAlbumCover, setNameOfArtist, setNumSongs } from "@/store/slices/albumSlice";
-import { setChangeSongList, SongList } from "@/store/slices/songListSlice";
+import { View, StyleSheet } from 'react-native';
+import MusicPlayer from '../musicPlayer';
+import { NavigationContainer} from '@react-navigation/native';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
+import HomeScreen from './homeScreen';
+import InsideAlbum from './albumContents';
+import Search from './search';
+import PlayLists from './playLists';
+import InsidePlaylist from './playlistContent';
+import ArtistPageContents from './artistPage';
 
-// https://reactnativeelements.com/docs
+const MainAppScreen: React.FC = () => {
+    const Tabs = createBottomTabNavigator();
 
-// Format of album
-interface Album {
-  title: string;
-  cover: number;
-  artist: string;
-  songs: {
-    title: string[];
-    path: number[];
-  };
-}
+    return (
+        
+            <NavigationContainer independent={true}>
+                <View style={{flex: 1,}}>
+                { /* Render music player above bar logic thanks to: https://stackoverflow.com/questions/74834004/react-native-how-to-show-an-element-above-bottom-tab-navigator */}
+                <Tabs.Navigator
+                tabBar={(props) => (
+                    <>
+                    <View style={{backgroundColor: 'black', position: 'absolute', height: 0}}>
+                        <MusicPlayer/>
+                    </View>
+                    <BottomTabBar style={{borderColor: 'black'}} {...props} />
+                    </>
+                )} 
+                screenOptions={{
+                    headerShown: false, 
+                    tabBarStyle: {backgroundColor: 'black'}
+                }}>
+                    <Tabs.Screen name ="Main Screen" component={HomeScreen} options={{tabBarIcon: () => ( <Ionicons name="home" size={38} color="blue"/>) }}/>
+                    <Tabs.Screen name ="Search For Music" component={Search} options={{tabBarIcon: () => ( <Ionicons name="search" size={38} color="blue"/>) }}/>
+                    <Tabs.Screen name ="Playlists" component={PlayLists} options={{tabBarIcon: () => ( <MaterialIcons name="library-music" size={38} color="blue"/>) }}/>
+                    <Tabs.Screen name ="AlbumContents" component={InsideAlbum} options={{ tabBarButton: () => null}}/>
+                    <Tabs.Screen name ="PlaylistContents" component={InsidePlaylist} options={{ tabBarButton: () => null}}/>
+                    <Tabs.Screen name='InsideArtist' component={ArtistPageContents} options={{ tabBarButton: () => null }}/>                   
+                 </Tabs.Navigator>
+                </View>
+                </NavigationContainer>
+    );
+};
 
+export default MainAppScreen;
 
-const HomeScreen: React.FC = ({navigation}: any) => {
-
-  const dispatch = useDispatch<AppDispatch>(); // Updates the state
-
-  
-  // dispatches actions to update states
-  const albumDetails = (album: Album) => {
-  dispatch(setNameOfAlbum(album.title))
-  dispatch(setNumSongs(album.songs.title.length));
-  dispatch(setAlbumCover(album.cover));
-  dispatch(setNameOfArtist(album.artist));
-
-  // Map song titles
-  const songList: SongList[] = album.songs.title.map((title, index) => ({
-    title,
-    path: album.songs.path[index],
-   }));
-  dispatch(setChangeSongList(songList));
-
-  navigation.navigate("AlbumContents");
-
-  };
-
-  // Render albums from imported albums using Album interface
-  const displayAlbums = ({item}: {item: Album}) => (
-    <TouchableOpacity onPress={() => albumDetails(item)}>
-      <View>
-        <Image source={item.cover} style={styles.imageInfo}/>
-      </View>
-    </TouchableOpacity>
-  );
-
-  return (
-      <LinearGradient
-        colors ={['#800080', '#a60fa6', '#940694']} 
-        locations={[0.3, 0.8, 0.99]} 
-        style={styles.gradient}
-      >
-        <SafeAreaView>
-            <FlatList 
-            horizontal
-            data={importedAlbums}
-            renderItem={displayAlbums}
-            keyExtractor={(album) => album.title}
-            />
-        </SafeAreaView>
-    </LinearGradient>
-  );
-}
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
-  text : {
-      color: 'white'
-  },
-  container: {
+    gradient: {
       flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-  },
-  imageInfo: {
-      width: 150,
-      height: 150,
-      resizeMode: 'cover',
-      marginRight: 20,
-  },
-});
-
-export default HomeScreen;
+    },
+ 
+  });
