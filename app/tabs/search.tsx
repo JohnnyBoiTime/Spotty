@@ -1,16 +1,15 @@
 import { View, StyleSheet, FlatList, TouchableOpacity, SafeAreaView } from "react-native";
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { useSelector } from "react-redux";
-import { RootState } from "@/store";
-import { Text, CheckBox, SearchBar} from "@rneui/themed";
+import { RootState } from "../../store/";
+import { Text, CheckBox, SearchBar, Image} from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { importedAlbums } from "../generatedFiles/Albums";
-import { setNameOfAlbum, setNumSongs, setAlbumCover, setNameOfArtist, } from "@/store/slices/albumSlice";
+import { setNameOfAlbum, setNumSongs, setAlbumCover, setNameOfArtist, setAlbumTitles, setAlbumCovers} from "../../store/slices/albumSlice";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store";
-import { setChangeSongList, setCurrentSongList, SongList } from "@/store/slices/songListSlice";
+import { AppDispatch } from "../../store";
+import { setChangeSongList, setCurrentSongList, SongList } from "../../store/slices/songListSlice";
 import { useAudio } from "../context";
-import { setPlayerAlbumCover } from "@/store/slices/playerSlice";
 
 // Format of album
 interface Album {
@@ -28,8 +27,8 @@ const Search: React.FC = ({navigation}: any) => {
   const [searching, setSearching] = useState('');
   const [searchChoice, setSearchChoice] = useState(0);
   const [filter, setFilter] = useState(['']);
+  const [uniqueArtists, setUniqueArtists] = useState(['']);
   const albumState = useSelector((state: RootState) => state.album);
-
 
   const {playSong} = useAudio();
 
@@ -46,15 +45,21 @@ const Search: React.FC = ({navigation}: any) => {
     
   };
 
+  useEffect(() => {
+  // Logic to remove duplicate artists https://stackoverflow.com/questions/37217953/removing-duplicate-array-values-and-then-storing-them-react  
+  const artists = importedAlbums.map((entry) => entry.artist);
+  setUniqueArtists(Array.from(new Set(artists)));
+  }, [])
+
   const changeSongColor = (name: string) => name === albumState.nameOfSong ? 'black' : 'white';
   
   const handleSongChange = (song: string, index: number) => {
 
-    // Finds albm cover using song title
+    // Finds album cover using song title
     for (const cover of importedAlbums) {
       const songIndex = cover.songs.title.indexOf(song);
       if (songIndex !== -1) {
-        console.log(cover.cover);
+        console.log(cover);
         dispatch(setAlbumCover(cover.cover));
       }
     }
@@ -79,6 +84,33 @@ const Search: React.FC = ({navigation}: any) => {
     navigation.navigate("AlbumContents");
   }
 
+  // Finds artist from Album.ts and
+  // stores info to display in the artist page
+  const goToArtist = (artistName: string) => {
+
+    let albumTitles = [];
+    let albumCovers = [];
+    let artistNameFound = '';
+    let songs = [];
+
+    // Match artist name to find info to display
+    for (const album of importedAlbums) {
+      const songIndex = album.artist.indexOf(artistName);
+      if (songIndex !== -1) {
+        albumTitles.push(album.title);
+        albumCovers.push(album.cover);
+        artistNameFound = album.artist;
+        songs = songs.concat(album.songs);
+      }
+    }
+
+    dispatch(setAlbumTitles(albumTitles));
+    dispatch(setAlbumCovers(albumCovers));
+    dispatch(setNameOfArtist(artistName));
+    dispatch(setChangeSongList(songs));
+
+    navigation.navigate("InsideArtist");
+  }
 
   const sort = () => {
     switch (searchChoice) {
@@ -108,12 +140,14 @@ const Search: React.FC = ({navigation}: any) => {
         </View> 
       )}
       />;
-      case 2: // Display onlt aritsts (Probs later do smth wit tapping the artist)
+      case 2: // Display only aritsts (Probs later do smth wit tapping the artist)
         return <FlatList 
-        data={importedAlbums}
+        data={uniqueArtists}
         renderItem = {({item, index}) => (
-          <View>
-                <Text style={{color:changeSongColor(albumState.nameOfSong)}} h1>{item.artist}</Text>
+          <View key={index}>
+            <TouchableOpacity onPress={() => goToArtist(item)}>
+                <Text style={{color:changeSongColor(albumState.nameOfSong)}} h1>{item}</Text>
+              </TouchableOpacity>
           </View> 
         )}
         />;
