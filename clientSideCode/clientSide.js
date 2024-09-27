@@ -1,20 +1,32 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
+const multer = require('multer');
+const app = express();
+
+app.use(express.json());
+const port = 3000;
+
+const upload = multer({ storage: multer.memoryStorage()});
+
 
 
 //get a presigned URL for uploading/downloading. upOrDown == 1 means upload, 0 means download
-const getPresignedURL = async (file, upOrDown) => {
+const getPresignedURL = async (artistName, file, upOrDown) => {
+
+	console.log(artistName, file);
+
 	try {
 		let presigned;
 
 		//upOrDown==1 means get a URL for uploading
 		if(upOrDown) {
-			presigned = await axios(`http://00.00.00.000:0000/upload?key=${file}`);
+			presigned = await axios(`http://52.43.11.167:3000/upload?key=${artistName}/${file}`);
 		}
 		//upOrDown==0 means get a URL for downloading
 		else {
-			presigned = await axios(`http://00.00.00.000:0000/download?key=${file}`);
+			presigned = await axios(`http://52.43.11.167:3000/download?key=${file}`);
 		}
 		//console.log(presigned.data.url);
 		return presigned.data.url;
@@ -25,26 +37,22 @@ const getPresignedURL = async (file, upOrDown) => {
 	}
 };
 
-const uploadFile = async(filePath) => {
-	//get the file name from the file path
-	fileName = path.basename(filePath);
-	//create a buffer
-	const fileData = fs.readFileSync(filePath);
+const uploadFile = async(fileBuffer, artistName, fileName) => {
 
 	try {
 		//get presigned URL for uploading
-		const presignedURL = await getPresignedURL(fileName, 1);
+		const presignedURL = await getPresignedURL(artistName, fileName, 1);
 
 		//create options object
 		var options = {
 			headers: {
-				'Content-Type': filePath.type,
-				'Content-Length': fileData.length
+				'Content-Type': 'audio/mpeg',
+				'Content-Length': fileBuffer.length,
 			}
 		};
 
 		//attempt to put the file into the S3
-		const res = await axios.put(presignedURL, fileData, options);
+		const res = await axios.put(presignedURL, fileBuffer, options);
 		
 		//if status is 200, upload was a success
 		if(res.status === 200) {
@@ -95,3 +103,17 @@ const downloadFile = async(fileNameS3, filePath) => {
 		console.error('Couldn\'t download file', err);
 	}
 }
+
+app.post('/upload-song', upload.single('song'), async(req, res) => {
+	try {
+		await uploadFile(req.file.buffer, req.body.artist, req.file.originalname);
+		res.status(200).send('File upload successful!');
+	} catch (error) {
+		console.log(error);
+	}
+})
+
+app.listen(port, () => {
+	console.log(`running on: ${port}`);
+});
+
