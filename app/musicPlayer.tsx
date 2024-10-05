@@ -1,14 +1,18 @@
 import { Text, View, StyleSheet} from "react-native";
 import React, {useState} from 'react';
+import { Asset } from "expo-asset";
+import * as FileSystem from 'expo-file-system';
 import { useDispatch, useSelector } from "react-redux";
 import { Icon, Card, Slider, Dialog, ButtonGroup, Input, Button, Image } from "@rneui/themed";
 import { Ionicons } from "@expo/vector-icons";
-import { RootState, AppDispatch } from "@/store"
+import { RootState, AppDispatch } from "../store"
 import { useAudio } from "./context";
-import { addSongToPlaylist, createPlaylist} from "@/store/slices/playlistSlice";
+import { addSongToPlaylist, createPlaylist, setPLayListCover} from "../store/slices/playlistSlice";
 import { TapGestureHandler, PanGestureHandler, PanGestureHandlerGestureEvent, HandlerStateChangeEvent } from "react-native-gesture-handler";
 import Animated, {useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
-import { setIsPlaying, setSongIndex, setIsOpen } from "@/store/slices/playerSlice";
+import axios from 'axios';
+
+// const urlServer = 'HIDDEN';
 
 // Interfaces
 interface Song {
@@ -27,6 +31,25 @@ interface Entry {
   song: Song,
 }
 
+interface SongData {
+  uri: string;
+};
+
+async function localPath(uri: string, destination: string): Promise<string> {
+  const asset = Asset.fromModule(uri);
+
+  await asset.downloadAsync();
+
+  const destinationPath = `${FileSystem.documentDirectory}${destination}`;
+
+  await FileSystem.copyAsync({
+    from: asset.localUri || '',
+    to: destinationPath,
+  });
+
+  return destinationPath; 
+};
+
 // Component for music player
 
 const MusicPlayer: React.FC = () => {
@@ -35,23 +58,56 @@ const MusicPlayer: React.FC = () => {
   const albumState = useSelector((state: RootState) => state.album);
   const playerState = useSelector((state: RootState) => state.player);
   const playList = useSelector((state: RootState) => state.playlist);
-  const {pauseSong, scroller, resumeSong, skipSong, prevSong} = useAudio();
+  const {playSong, pauseSong, scroller, resumeSong, skipSong, prevSong} = useAudio();
   const [playlistName, setPlaylistName] = useState('');
   const [songName, setSongName] = useState('');
   const [visible, setVisible] = useState(false);
-  const [tapButton, setTapButton] = useState(false);
   const yDir = useSharedValue(650);
 
-  // Possible do useState to re-render all the components when
-  // yDir equals something
+
+  // Code for using an amazon AWS bucket
+
+  /*
+  // Send song to server to put into S3 bucket
+  async function postSong({song}: {song: SongData}): Promise<void> {
+    const formData = new FormData();
+    formData.append('song', {
+      uri: song.uri,
+      type: 'audio/mpeg',
+      name: song.uri.split('/').pop(),
+    } as any);
   
+    formData.append('artist', albumState.nameOfArtist);
+  
+    const result = await axios.post(`${urlServer}/upload-song`, formData, {
+      headers: {'Content-Type': 'multipart/form-data'},
+    });
+  
+    return result.data;
+  
+  };
+  
+  // Submits current song that is playing TEST
+  const submit = async () => {
+    try {
+      const localPathThing = await localPath(require(`./assets/Albums/${albumState.nameOfArtist} - ${albumState.nameOfAlbum}/${albumState.nameOfArtist}  - ${albumState.nameOfArtist} - 08 시계 (Backwards).mp3`), 'Backwards.mp3');
+      const song = {uri: localPathThing};
+      const result = await postSong({song});
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  */
 
   // Coneals/displays music player and keeps it in bounds
   const swiping = (event: PanGestureHandlerGestureEvent) => {
+
       yDir.value = event.nativeEvent.absoluteY;
+      console.log(yDir.value);
     if (event.nativeEvent.absoluteY < 650) {
       yDir.value = 650;
-
     }
     if (event.nativeEvent.absoluteY > 772) {
       yDir.value = 772
@@ -61,17 +117,11 @@ const MusicPlayer: React.FC = () => {
 
   // Open and close the player
   const tapping = (event: HandlerStateChangeEvent) => {
-
-    // Opened
-    if (yDir.value == 772 && tapButton == false && event.nativeEvent.numberOfPointers === 1) {
+    if (yDir.value === 772 && event.nativeEvent.numberOfPointers === 1) {
       yDir.value = withTiming(650);
-      dispatch(setIsOpen(true));
     }
-    else {
-      // Closed
+    if (yDir.value === 650 && event.nativeEvent.numberOfPointers === 1) {
       yDir.value = withTiming(772);
-      dispatch(setIsOpen(false));
-    
     }
   }
 
@@ -88,13 +138,6 @@ const MusicPlayer: React.FC = () => {
     scroller(value);
   };
 
-  const nextSong = (value: number) => {
-    if (value == 1) {
-      const nextIndex = playerState.songIndex + 1;
-      dispatch(setSongIndex(nextIndex));
-    }
-  }
-
   const showPlaylists = (songTitle: string, list: any) =>{
     setSongName(songTitle);
     setVisible(true);
@@ -102,22 +145,9 @@ const MusicPlayer: React.FC = () => {
 
   // Changes text input
   const input = (inputted: string,) =>{
-     setPlaylistName(inputted);
+    setPlaylistName(inputted);
   };
 
-  const handlePlayPause = () => {
-    setTapButton(true);
-    if (playerState.isPlaying == true) {
-      console.log("Song is playing!");
-      pauseSong();
-      dispatch(setIsPlaying(false));
-    }
-    else {
-      console.log("Song is NOT playing!");
-      resumeSong();
-      dispatch(setIsPlaying(true));
-    }
-  }
 
   const saveSongTap = (playlist: string) => {
 
@@ -146,7 +176,6 @@ const MusicPlayer: React.FC = () => {
   const saveSong = (songTitle: string) => {
     try {
 
-      setTapButton(true);
       // Format for playlist
       const playListEntry: Playlist = 
         {
@@ -167,12 +196,14 @@ const MusicPlayer: React.FC = () => {
         // Does the playlist already exist?
         if (!findPlaylistMatch) {
           dispatch(createPlaylist(playListEntry));
-          console.log("Playlist created!");
+          console.log("Playlist created!")
+          
         }
         else {
           // The playlist already exists, but what about the song?
           if (!findSongMatch) {
             dispatch(addSongToPlaylist(songEntry));
+            dispatch(setPLayListCover(playerState.playerAlbumCover));
           }
           else {
             console.log(`Song already exists in: ${playListEntry.nameOfPlaylist}`);
@@ -205,31 +236,22 @@ const MusicPlayer: React.FC = () => {
     <View style={styles.view}>
     <Image style={styles.playerImage} key={albumState.albumCover} source={playerState.playerAlbumCover}/>
     <Card.FeaturedSubtitle numberOfLines={1} ellipsizeMode='tail' style={styles.cardSongTitle}>{albumState.nameOfSong}</Card.FeaturedSubtitle>
-          <Icon color={'white'} name='save' onPress={() => showPlaylists(albumState.nameOfSong, playList.playlists)}/>    
-        { playerState.isOpen ? (
-          <Icon color={'white'} name='save' onPress={() => showPlaylists(albumState.nameOfSong, playList.playlists)}/>    
-        ) : (
-          <View style={{flexDirection: 'row'}}>
-          <Icon color={'white'} name='save' onPress={() => showPlaylists(albumState.nameOfSong, playList.playlists)}/>    
-          <Ionicons size={25} color={'white'} name={playerState.isPlaying ? 'pause' : 'play'} onPress={() => handlePlayPause() }/>
-          <Ionicons size={25} color={'white'} name={'arrow-up'} onPress={() => setTapButton(false) }/>
-        </View>
-        )
-      }
+      <View>
+      <Icon color={'white'} name='save' onPress={() => showPlaylists(albumState.nameOfSong, playList.playlists) }/>
+      </View>
     </View>  
     </Animated.View>
     </TapGestureHandler>
     <Card.Divider/>
     <View style={{flexDirection: 'row'}}>
     <Text style={{color: 'white'}}> {time(playerState.playbackPos)}</Text>
-    <Text style={{color: 'white', paddingLeft: 290}}> {time(playerState.playbackDuration)}</Text>
+    <Text style={{color: 'white', paddingLeft: 320}}> {time(playerState.playbackDuration)}</Text>
     </View>
     <Slider
     minimumTrackTintColor="blue"
     value={playerState.playbackPos / playerState.playbackDuration || 0}
     minimumValue={0}
     maximumValue={1}
-    onSlidingComplete={nextSong}
     step={0.001}
     onValueChange={songProgress}
     thumbStyle={styles.thumb}
@@ -274,7 +296,7 @@ const MusicPlayer: React.FC = () => {
           </Dialog>
     </Card>
   ) : (
-    <Text></Text> // Empty
+    <Text></Text> // Don't show music player if song not playing
    )}
       </Animated.View>
       </PanGestureHandler>
@@ -358,3 +380,4 @@ const styles = StyleSheet.create({
   });
 
   export default MusicPlayer;
+
