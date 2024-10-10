@@ -7,9 +7,8 @@ Finished re-writing in 7/26/2024
 Features:
 -Playing music (WOW)
 - Make playlists
-- Store songs locally on device
 - Music player that is present around the app allows user to skip, go to previous, pause, play, and seek through currently playing songs.  Can hide or show music player.
-- Generate albums simply by placing an album folder with songs into assets and running node GenerateAlbums.js
+- Generate albums to play in app simply by placing an album folder with songs into assets and running node GenerateAlbums.js
 - Search through songs
 - Go to an artists page to see all their songs and albums
 
