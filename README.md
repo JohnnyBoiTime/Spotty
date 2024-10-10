@@ -15,8 +15,8 @@ Features:
 Uses:
 - React Redux and useContext, although redux is more heavily used
 - React native elements for UI
-- Various expo libraries for audio and sending files ot device
+- Various expo libraries for audio and sending files to device
 - AsyncStorage
 - React navigation
-- Amazon AWS for backend
+- Amazon AWS for backend (not completed or optimized but is ready to link)
 
