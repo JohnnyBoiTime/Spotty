@@ -1,4 +1,6 @@
-A music storage system where you can store and play music. Original name was spotty, but changed to Jammi. Images folder contains images that should give an idea of the app. 
+A music storage system where you can store and play music. Original name was spotty, but changed to Jammi. 
+
+Images folder contains images that should give an idea of the app. 
 
 Originally in javascript, started re-writing into typescript in 7/18/2024 and
 
