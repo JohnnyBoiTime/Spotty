@@ -58,3 +58,4 @@ const playListSlice = createSlice({
 // exports actions to use in app
 export const {createPlaylist, addSongToPlaylist, setPlayList, setPLayListCover} = playListSlice.actions; 
 export default playListSlice.reducer; // exports reducer to handle actions
+

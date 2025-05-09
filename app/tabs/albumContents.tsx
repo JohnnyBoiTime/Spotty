@@ -50,9 +50,6 @@ const InsideAlbum: React.FC = () => {
   };
 
   // Get position to know when the scroller is at the end
-  // Maybe add animation thta coincides with music player being opened
-  // so there isn't just a square over the songs when you open it not at the end
-  // FIX TIME BECAUSE THE END TIME ISNT ALIGNED WITH THE RIGHT ITS OFF AAAAAAAA
   const scrollerPosition = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const {contentOffset} = event.nativeEvent;
     yDir.value = Math.floor(contentOffset.y);

@@ -10,11 +10,6 @@ import { setCurrentSongList, SongList, setChangeSongList } from "../../store/sli
 import { setNumSongs, setNameOfAlbum, setAlbumCover, setNameOfArtist} from "../../store/slices/albumSlice";
 import { useAudio } from "../context";
 
-// Display top 5 most played songs, display all of the artists albums
-
-// Find out why tf the player isnt changing the album cover 
-// wtffffffffff
-
 // Displays artist
 const ArtistPageContents: React.FC = ({navigation}: any) => {
 

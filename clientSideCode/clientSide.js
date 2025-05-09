@@ -22,11 +22,11 @@ const getPresignedURL = async (artistName, file, upOrDown) => {
 
 		//upOrDown==1 means get a URL for uploading
 		if(upOrDown) {
-			presigned = await axios(`http://52.43.11.167:3000/upload?key=${artistName}/${file}`);
+			presigned = await axios(`http://HIDDEN:3000/upload?key=${artistName}/${file}`);
 		}
 		//upOrDown==0 means get a URL for downloading
 		else {
-			presigned = await axios(`http://52.43.11.167:3000/download?key=${file}`);
+			presigned = await axios(`http://HIDDEN:3000/download?key=${file}`);
 		}
 		//console.log(presigned.data.url);
 		return presigned.data.url;
@@ -116,5 +116,3 @@ app.post('/upload-song', upload.single('song'), async(req, res) => {
 app.listen(port, () => {
 	console.log(`running on: ${port}`);
 });
-
-
