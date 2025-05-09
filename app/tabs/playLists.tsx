@@ -1,10 +1,10 @@
 import { View, StyleSheet, TouchableOpacity, SafeAreaView, FlatList } from "react-native";
 import React, {useState} from 'react';
-import { AppDispatch, RootState } from "@/store";
+import { AppDispatch, RootState } from "../../store";
 import { createTheme, darkColors, Card, Text, Input, lightColors, Image, ThemeProvider, Button } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { setPlayList } from "@/store/slices/playlistSlice";
+import { setPlayList } from "../../store/slices/playlistSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ScrollView } from "react-native";
 

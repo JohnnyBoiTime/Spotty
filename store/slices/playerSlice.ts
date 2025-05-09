@@ -19,6 +19,7 @@ interface PlayerState {
     isPlaying: boolean;
     playbackPos: number;
     playbackDuration: any;
+    isOpen: boolean;
 }
 
 // Initial states
@@ -30,6 +31,7 @@ const initialState: PlayerState = {
     isPlaying: false,
     playbackPos: 0,
     playbackDuration: 0,
+    isOpen: false,
 };
 
 // slice/reducers
@@ -58,9 +60,12 @@ const playerSlice = createSlice({
         setPlaybackDuration(state, action: PayloadAction<any>) {
             state.playbackDuration = action.payload;
         },
+        setIsOpen(state, action: PayloadAction<boolean>) {
+            state.isOpen = action.payload;
+        }
     },
 });
 
 // export actions and reducer
-export const {setAudioToPlay, setIsPlaying, setPlayerAlbumCover, setPlayAudio, setSongIndex, setPlaybackPos, setPlaybackDuration} = playerSlice.actions;
+export const {setAudioToPlay, setIsPlaying, setPlayerAlbumCover, setPlayAudio, setSongIndex, setPlaybackPos, setPlaybackDuration, setIsOpen} = playerSlice.actions;
 export default playerSlice.reducer;

@@ -3,9 +3,9 @@ import React from 'react';
 import { Text, Button} from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/store";
-import { setCurrentSongList } from "@/store/slices/songListSlice";
-import {  setSongIndex, setIsPlaying  } from "@/store/slices/playerSlice";
+import { RootState, AppDispatch } from "../../store";
+import { setCurrentSongList } from "../../store/slices/songListSlice";
+import {  setSongIndex, setIsPlaying  } from "../../store/slices/playerSlice";
 import { useAudio } from "../context";
 
 // Interfaces
@@ -35,6 +35,11 @@ const InsidePlaylist: React.FC = () => {
     dispatch(setSongIndex(index));
     playSong(songTitle, index);
   };
+
+  // shuffle music in the playlist
+  const shuffleMusic = () => {
+    
+  }
 
   const changeSongColor = (name: string) => name === albumState.nameOfSong ? 'black' : 'white';
 

@@ -4,10 +4,10 @@ import * as FileSystem from 'expo-file-system';
 import { Asset} from "expo-asset";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { importedAlbums } from "./generatedFiles/Albums";
-import { setIsPlaying, setPlaybackDuration, setPlaybackPos, setSongIndex } from "@/store/slices/playerSlice";
-import { AppDispatch, RootState } from "@/store";
+import { setIsPlaying, setPlaybackDuration, setPlaybackPos, setSongIndex } from "../../Spotty/store/slices/playerSlice";
+import { AppDispatch, RootState } from "../../Spotty/store/";
 import { useDispatch, useSelector } from "react-redux";
-import { setNameOfSong } from "@/store/slices/albumSlice";
+import { setNameOfSong } from "../../Spotty/store/slices/albumSlice";
 
 // Thanks to https://dev.to/elisealcala/react-context-with-usereducer-and-typescript-4obm
 

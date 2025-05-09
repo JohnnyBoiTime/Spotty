@@ -1,24 +1,34 @@
 import { View, StyleSheet, FlatList, TouchableOpacity, SafeAreaView } from "react-native";
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { useSelector } from "react-redux";
-import { RootState } from "@/store";
-import { Text, CheckBox, SearchBar} from "@rneui/themed";
+import { RootState } from "../../store/";
+import { Text, CheckBox, SearchBar, Image} from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { importedAlbums } from "../generatedFiles/Albums";
-import { setNumSongs } from "@/store/slices/albumSlice";
+import { setNameOfAlbum, setNumSongs, setAlbumCover, setNameOfArtist, setAlbumTitles, setAlbumCovers} from "../../store/slices/albumSlice";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store";
-import { setCurrentSongList } from "@/store/slices/songListSlice";
+import { AppDispatch } from "../../store";
+import { setChangeSongList, setCurrentSongList, SongList } from "../../store/slices/songListSlice";
 import { useAudio } from "../context";
 
-const Search: React.FC = () => {
+// Format of album
+interface Album {
+  title: string;
+  cover: number;
+  artist: string;
+  songs: {
+    title: string[];
+    path: number[];
+  };
+}
 
-  const [showPassword, setShowPassword] = useState(false);
+const Search: React.FC = ({navigation}: any) => {
+
   const [searching, setSearching] = useState('');
   const [searchChoice, setSearchChoice] = useState(0);
   const [filter, setFilter] = useState(['']);
+  const [uniqueArtists, setUniqueArtists] = useState(['']);
   const albumState = useSelector((state: RootState) => state.album);
-
 
   const {playSong} = useAudio();
 
@@ -31,22 +41,75 @@ const Search: React.FC = () => {
     const more = importedAlbums.map(album => album.songs.title.flat(1));
     const singleList = more.flat(1);
     setFilter(singleList.filter((song) => song.toLowerCase().includes(searcher.toLowerCase())));
-   console.log(filter);
+    console.log(filter);
+    
   };
 
-  const handlePress = () => {
-    console.log("Pressed");
-    
-  }
+  useEffect(() => {
+  // Logic to remove duplicate artists https://stackoverflow.com/questions/37217953/removing-duplicate-array-values-and-then-storing-them-react  
+  const artists = importedAlbums.map((entry) => entry.artist);
+  setUniqueArtists(Array.from(new Set(artists)));
+  }, [])
 
   const changeSongColor = (name: string) => name === albumState.nameOfSong ? 'black' : 'white';
   
   const handleSongChange = (song: string, index: number) => {
+
+    // Finds album cover using song title
+    for (const cover of importedAlbums) {
+      const songIndex = cover.songs.title.indexOf(song);
+      if (songIndex !== -1) {
+        console.log(cover);
+        dispatch(setAlbumCover(cover.cover));
+      }
+    }
     dispatch(setCurrentSongList([song]))
     dispatch(setNumSongs(1));
     playSong(song, index);
   }
 
+  // Fills in "identifying" info for album
+  const goToAlbum = (album: Album ) => {
+    dispatch(setNameOfAlbum(album.title))
+    dispatch(setNumSongs(album.songs.title.length));
+    dispatch(setAlbumCover(album.cover));
+    dispatch(setNameOfArtist(album.artist));
+  
+    // Map song titles
+    const songList: SongList[] = album.songs.title.map((title, index) => ({
+      title,
+      path: album.songs.path[index],
+     }));
+    dispatch(setChangeSongList(songList));
+    navigation.navigate("AlbumContents");
+  }
+
+  // Fills in identifying info to display
+  // on artist page
+  const goToArtist = (artistName: string) => {
+
+    let albumTitles = [];
+    let albumCovers = [];
+    let artistNameFound = '';
+    let songs = [];
+
+    for (const album of importedAlbums) {
+      const songIndex = album.artist.indexOf(artistName);
+      if (songIndex !== -1) {
+      albumTitles.push(album.title);
+      albumCovers.push(album.cover);
+      artistNameFound = album.artist;
+      songs = songs.concat(album.songs);
+      }
+    }
+
+    dispatch(setAlbumTitles(albumTitles));
+    dispatch(setAlbumCovers(albumCovers));
+    dispatch(setNameOfArtist(artistName));
+    dispatch(setChangeSongList(songs));
+
+    navigation.navigate("InsideArtist");
+  }
 
   const sort = () => {
     switch (searchChoice) {
@@ -70,18 +133,20 @@ const Search: React.FC = () => {
       data={filter}
       renderItem = {({item, index}) => (
         <View key={index}>
-          <TouchableOpacity  onPress={() => handleSongChange(item, index)}>
+          <TouchableOpacity onPress={() => handleSongChange(item, index)}>
                   <Text style={{color:changeSongColor(item)}}>{item}</Text>
                 </TouchableOpacity>
         </View> 
       )}
       />;
-      case 2: // Display onlt aritsts (Probs later do smth wit tapping the artist)
+      case 2: // Display only aritsts (Probs later do smth wit tapping the artist)
         return <FlatList 
-        data={importedAlbums}
+        data={uniqueArtists}
         renderItem = {({item, index}) => (
-          <View>
-                <Text style={{color:changeSongColor(albumState.nameOfSong)}} h1>{item.artist}</Text>
+          <View key={index}>
+            <TouchableOpacity onPress={() => goToArtist(item)}>
+                <Text style={{color:changeSongColor(albumState.nameOfSong)}} h1>{item}</Text>
+              </TouchableOpacity>
           </View> 
         )}
         />;
@@ -90,7 +155,9 @@ const Search: React.FC = () => {
         data={importedAlbums}
         renderItem = {({item, index}) => (
           <View key={index}>
-                <Text style={{color:changeSongColor(albumState.nameOfSong)}} h1>{item.title}</Text>
+                <TouchableOpacity onPress={() => goToAlbum(item)}>
+                <Text style={{color: 'black'}} h1>{item.title}</Text>
+                </TouchableOpacity>
           </View> 
         )}
         />;
@@ -116,7 +183,6 @@ const Search: React.FC = () => {
       clearIcon
       round
       rightIcon={{name: 'book'}}
-      searchIcon={{onPress: handlePress}}
     />
     </SafeAreaView>
     <View style={{flexDirection: 'row'}}>

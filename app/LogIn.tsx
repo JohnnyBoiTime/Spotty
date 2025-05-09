@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import React, {useState} from 'react';
 import { Card, Input,  Button } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
@@ -30,7 +30,7 @@ const LogIn: React.FC = ({navigation}: any) => {
           placeholderTextColor={'white'}
           inputStyle={{color: 'white'}}
           leftIcon={<Ionicons name='person' size={24} color='white'/>} 
-          placeholder="Username" > 
+          placeholder={process.env.DB_NAME} > 
         </Input>
         <Input 
           secureTextEntry={ showPassword }

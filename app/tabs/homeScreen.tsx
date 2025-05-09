@@ -4,9 +4,9 @@ import { useDispatch, } from "react-redux";
 import { Image } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { importedAlbums } from "../generatedFiles/Albums";
-import { AppDispatch } from "@/store";
-import { setNameOfAlbum, setAlbumCover, setNameOfArtist, setNumSongs } from "@/store/slices/albumSlice";
-import { setChangeSongList, SongList } from "@/store/slices/songListSlice";
+import { AppDispatch } from "../../store";
+import { setNameOfAlbum, setAlbumCover, setNameOfArtist, setNumSongs } from "../../store/slices/albumSlice";
+import { setChangeSongList, SongList } from "../..//store/slices/songListSlice";
 
 // https://reactnativeelements.com/docs
 
@@ -48,7 +48,7 @@ const HomeScreen: React.FC = ({navigation}: any) => {
   // Render albums from imported albums using Album interface
   const displayAlbums = ({item}: {item: Album}) => (
     <TouchableOpacity onPress={() => albumDetails(item)}>
-      <View>
+      <View style={{paddingTop: 20}}>
         <Image source={item.cover} style={styles.imageInfo}/>
       </View>
     </TouchableOpacity>
@@ -61,8 +61,9 @@ const HomeScreen: React.FC = ({navigation}: any) => {
         style={styles.gradient}
       >
         <SafeAreaView>
-            <FlatList 
-            horizontal
+            <FlatList
+            contentContainerStyle={{padding: 47}} 
+            numColumns={2}
             data={importedAlbums}
             renderItem={displayAlbums}
             keyExtractor={(album) => album.title}

@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import playerSlice from "./playerSlice";
 
 // Very similar to an album so pretty much uses the same structure
 // minus name of album
@@ -50,9 +49,12 @@ const playListSlice = createSlice({
         setPlayList: (state, action: PayloadAction<Playlist>) => {
             state.displayPlaylist = action.payload;
         },
+        setPLayListCover: (state, action:PayloadAction<number>) => {
+            state.displayPlaylist.playlistCover = action.payload;
+        },
     },
 });
 
 // exports actions to use in app
-export const {createPlaylist, addSongToPlaylist, setPlayList} = playListSlice.actions; 
+export const {createPlaylist, addSongToPlaylist, setPlayList, setPLayListCover} = playListSlice.actions; 
 export default playListSlice.reducer; // exports reducer to handle actions
