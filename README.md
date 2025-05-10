@@ -8,13 +8,23 @@ Finished re-writing in 7/26/2024
 
 Features:
 -Playing music (WOW)
-
+- Music player that is present around the app allows user to skip, go to previous, pause, play, and seek through currently playing songs.  Can hide or show music player.
 
 ![Demo](./assets/playerDemo.gif)
+![Demo](./assets/skipPrevious.gif)
 
-- Music player that is present around the app allows user to skip, go to previous, pause, play, and seek through currently playing songs.  Can hide or show music player.
 - Generate albums to play in app simply by placing an album folder with songs into assets and running node GenerateAlbums.js
+
+![Demo](./assets/switchingAlbums.gif)
+  
 - Search through songs
+
+![Demo](./assets/searching.gif)
+
+- Make playlists
+
+- ![Demo](./assets/playlsits.gif)
+  
 - Go to an artists page to see all their songs and albums
 
 Uses:
