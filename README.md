@@ -23,7 +23,7 @@ Features:
 
 - Make playlists
 
-- ![Demo](./assets/playlsits.gif)
+- ![Demo](./assets/playlits.gif)
   
 - Go to an artists page to see all their songs and albums
 
