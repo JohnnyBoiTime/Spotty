@@ -12,6 +12,7 @@ Features:
 
 ![Demo](./assets/playerDemo.gif)
 ![Demo](./assets/skipPrevious.gif)
+![Demo](./assets/hideShowMusicPlayer.gif)
 
 - Generate albums to play in app simply by placing an album folder with songs into assets and running node GenerateAlbums.js
 
