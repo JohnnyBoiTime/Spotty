@@ -1,4 +1,5 @@
 import React, { createContext, useRef, useEffect, useContext } from "react";
+import { Platform } from "react-native";
 import { Audio } from "expo-av";
 import * as FileSystem from 'expo-file-system';
 import { Asset} from "expo-asset";
@@ -53,6 +54,9 @@ export const AudioProvider = ({children} : {children: React.ReactNode}) => {
 
     // Store files locally on device
     const songStorage = async (filePath: string, fileName: string): Promise<string | null> => {
+        if (Platform.OS === 'web') {
+          return filePath;
+        }
     
       const songUri = `${FileSystem.documentDirectory}${fileName}.mp3`;
 
@@ -90,6 +94,10 @@ export const AudioProvider = ({children} : {children: React.ReactNode}) => {
 
       const albumStorage = async (albumPath: string, fileName: string): Promise<string | null> => {
         
+        if (Platform.OS === 'web') {
+          return albumPath;
+        }
+
         const albumUri = `${FileSystem.documentDirectory}${fileName}.jpg`;
 
         try {
@@ -264,8 +272,15 @@ export const AudioProvider = ({children} : {children: React.ReactNode}) => {
 
     // Play new song on index change
     useEffect(() => {
-      playSong(songList.currentSongList[playerState.songIndex], playerState.songIndex);
-    }, [playerState.songIndex]);
+     // playSong(songList.currentSongList[playerState.songIndex], playerState.songIndex);
+      
+     const list = songList.currentSongList;
+     const index = playerState.songIndex;
+     if (list.length > 0 && index >= 0 && index < list.length) {
+      playSong(list[index], index);
+     }
+    
+    }, [playerState.songIndex, songList.currentSongList]);
 
     // Provider
     return (
