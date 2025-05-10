@@ -7,6 +7,9 @@
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "types/**/*"]
+  "include": [
+    "src/**/*",
+    "types/**/*"
+  ],
+  "extends": "expo/tsconfig.base"
 }
-
