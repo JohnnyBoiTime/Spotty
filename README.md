@@ -10,7 +10,6 @@ Features:
 -Playing music (WOW)
 - Music player that is present around the app allows user to skip, go to previous, pause, play, and seek through currently playing songs.  Can hide or show music player.
 
-![Demo](./assets/playerDemo.gif)
 ![Demo](./assets/skipPrevious.gif)
 ![Demo](./assets/hideShowMusicPlayer.gif)
 
