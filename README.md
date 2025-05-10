@@ -8,7 +8,8 @@ Finished re-writing in 7/26/2024
 
 Features:
 -Playing music (WOW)
-- Make playlists
+
+
 ![Demo](./assets/playerDemo.gif)
 
 - Music player that is present around the app allows user to skip, go to previous, pause, play, and seek through currently playing songs.  Can hide or show music player.
