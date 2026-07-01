@@ -21,13 +21,13 @@ Features:
 
 ![Demo](./assets/searching.gif)
 
-- Make playlists
-
-![Demo](./assets/playlists.gif)
-  
 - Go to an artists page to see all their songs and albums
 
 ![Demo](./assets/artistPage.gif)
+
+- Make playlists
+
+![Demo](./assets/playlists.gif)
 
 Uses:
 - React Redux and useContext, although redux is more heavily used
